@@ -1,12 +1,14 @@
 import FeedBoard from "./FeedBoard";
 import Divider from "./Divider";
 import Footer from "./Footer";
-import Projects from "./Projects";
+import CardCollection from "./CardCollection";
+import { eveStuff, projects } from "./ProjectsCollection";
 
 function App() {
     return (
         <>
-            <Projects />
+            <CardCollection title="Projects" cards={projects}/>
+            <CardCollection title="Eve stuff" cards={eveStuff}/>
             <Divider />
             <FeedBoard />
             <Footer />
