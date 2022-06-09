@@ -1,4 +1,4 @@
-import { CardCollectionProps } from "./CardCollection";
+import { CardCollectionProps } from "../Components/CardCollection";
 import { other, projects } from "./ProjectsCollection";
 
 export const cardCollections: CardCollectionProps[] = [

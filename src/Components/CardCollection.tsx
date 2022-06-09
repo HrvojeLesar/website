@@ -1,4 +1,4 @@
-import { IInfoCard } from "./IInfoCard";
+import { IInfoCard } from "../Data/IInfoCard";
 import InfoCard from "./InfoCard";
 
 export type CardCollectionProps = {

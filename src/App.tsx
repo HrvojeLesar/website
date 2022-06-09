@@ -1,11 +1,11 @@
-import FeedBoard from "./FeedBoard";
-import Divider from "./Divider";
-import Footer from "./Footer";
-import CardCollection from "./CardCollection";
 import { useState } from "react";
-import Navbar, { NavbarButton } from "./Navbar";
-import { cardCollections } from "./CardCollections";
-import { contactInfo } from "./ContactInfo";
+import CardCollection from "./Components/CardCollection";
+import Divider from "./Components/Divider";
+import FeedBoard from "./Components/FeedBoard";
+import Footer from "./Components/Footer";
+import Navbar, { NavbarButton } from "./Components/Navbar";
+import { cardCollections } from "./Data/CardCollections";
+import { contactInfo } from "./Data/ContactInfo";
 
 function App() {
     const [show, setShow] = useState(false);

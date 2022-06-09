@@ -1,4 +1,4 @@
-import { IInfoCard } from "./IInfoCard";
+import { IInfoCard } from "../Data/IInfoCard";
 
 type InfoCardProps = {
     infoCard: IInfoCard;

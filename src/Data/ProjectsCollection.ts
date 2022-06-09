@@ -1,11 +1,11 @@
 import { IInfoCard } from "./IInfoCard";
-import PepegaPhone from "./Images/Pepegaphone";
-import MM from "./Images/mm.png";
+import PepegaPhone from "../Images/Pepegaphone";
+import MM from "../Images/mm.png";
 
 import { FaBook, FaGithub, FaGlobeEurope } from "react-icons/fa";
 
-import PATHFINDER from "./Images/pathfinder.png";
-import AocLogo from "./AoCLogo";
+import PATHFINDER from "../Images/pathfinder.png";
+import AocLogo from "../Components/AoCLogo";
 
 export const projects: IInfoCard[] = [
     {
@@ -13,9 +13,7 @@ export const projects: IInfoCard[] = [
         description:
             "Website for controlling a Discord bot that plays uploaded sounds.",
         moreInfo:
-            "Website used to control a Discord bot made for playing short sounds. \
-                    Original version supported only one server, therefore v2 adds support \
-                    for multiple servers and an open API for making your own frontend.",
+            "Website used to control a Discord bot made for playing short sounds. Original version supported only one server, therefore v2 adds support for multiple servers and an open API for making your own frontend.",
         image: {
             src: PepegaPhone(),
             alt: "Kekov soundboard v2",
@@ -39,8 +37,7 @@ export const projects: IInfoCard[] = [
     {
         title: "Undergraduate thesis",
         description:
-            "Web application and separate rust library for solving \
-                assignment problems using the Hungarian method.",
+            "Web application and separate rust library for solving assignment problems using the Hungarian method.",
         note: "Thesis and website is only available in Croatian.",
         image: {
             src: MM,
@@ -94,8 +91,7 @@ export const other: IInfoCard[] = [
     {
         title: "Advent of code",
         description:
-            "Advent of Code is an Advent calendar of small \
-            programming puzzles for a variety of skill sets and skill levels",
+            "Advent of Code is an Advent calendar of small programming puzzles for a variety of skill sets and skill levels",
         moreInfo: "Below are links to repositories for my solutions.",
         image: {
             src: AocLogo(),
@@ -121,10 +117,7 @@ export const other: IInfoCard[] = [
         title: "Pathfinder",
         description: "Pathfinder is a mapping tool for Eve Online.",
         moreInfo:
-            "Official Pathfinder website is down and most others requires \
-            you to be a part of their alliance or corporation, \
-            so I decided to host my own. As is tradition this requires \
-            you to be a port of Fifty Fifty Fifty corporation.",
+            "Official Pathfinder website is down and most others requires you to be a part of their alliance or corporation, so I decided to host my own. As is tradition this requires you to be a port of Fifty Fifty Fifty corporation.",
         image: {
             src: PATHFINDER,
             alt: "Pathfinder logo",
