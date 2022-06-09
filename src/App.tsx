@@ -22,7 +22,7 @@ function App() {
                         />
                     );
                 })}
-                buttonsRight={contactInfo.filter((ci) => { return ci.type !== "E-Mail"}).map((ci) => {
+                buttonsRight={contactInfo.map((ci) => {
                         return (
                         <NavbarButton
                             key={ci.type}

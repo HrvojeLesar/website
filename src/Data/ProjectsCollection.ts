@@ -32,6 +32,12 @@ export const projects: IInfoCard[] = [
                 icon: FaGithub,
                 iconDecsShort: "Source code",
             },
+            {
+                title: "Website v1",
+                url: "https://bot.hrveklesarov.com",
+                icon: FaGlobeEurope,
+                iconDecsShort: "V1 website",
+            },
         ],
     },
     {

@@ -17,7 +17,7 @@ export function NavbarButton({ value, url, icon }: NavbarButtonProps) {
         >
         {icon ? (
                 <div className="flex gap-2 justify-center items-center">
-                {icon ? (icon({size: 28})) : (<></>)}
+                {icon ? (icon({size: 28, className: "hidden sm:block"})) : (<></>)}
                 {value}
                 </div>
         ): (value)}
@@ -33,7 +33,7 @@ type NavbarProps = {
 
 export default function Navbar({ buttonsLeft, buttonsRight }: NavbarProps) {
     return (
-        <div className="sticky top-0 left-0 flex justify-between p-2 bg-black opacity-70">
+        <div className="sticky top-0 left-0 flex justify-between p-2 bg-black opacity-70 overflow-x-hidden">
             {buttonsLeft ? (
                 <div className="flex gap-2">{buttonsLeft}</div>
             ) : (

@@ -12,6 +12,7 @@ export const contactInfo: ContactInfo[] = [
     {
         type: "E-Mail",
         contact: "hrvoje.lesar1@hotmail.com",
+        url: "mailto://hrvoje.lesar1@hotmail.com",
         icon: FaEnvelope,
     },
     {
