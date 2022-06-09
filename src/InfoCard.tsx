@@ -50,10 +50,47 @@ export default function InfoCard({ infoCard, reverse }: InfoCardProps) {
                         {infoCard.moreInfo === undefined ? (
                             <></>
                         ) : (
-                            <div className="pt-1 leading-relaxed text-lime-lg text-dark-200">
+                            <div className="pt-1 leading-relaxed text-dark-200">
                                 {infoCard.moreInfo}
                             </div>
                         )}
+                        {infoCard.note === undefined ? (
+                            <></>
+                        ) : (
+                            <div className="pt-1 leading-relaxed text-sm text-dark-300">
+                                {`Note: ${infoCard.note}`}
+                            </div>
+                        )}
+                        <div className="flex flex-row gap-4 pt-4">
+                            {infoCard.linkButtons?.map((l) => {
+                                return (
+                                    <div
+                                        key={l.title}
+                                        className="grid grid-rows-2 gap-1"
+                                    >
+                                        <a
+                                            title={l.title}
+                                            href={l.url}
+                                            className="justify-self-center"
+                                        >
+                                            <l.icon
+                                                size={42}
+                                                className="ease-in-out duration-150 hover:fill-gray-500"
+                                            />
+                                        </a>
+                                        <a
+                                            title={l.title}
+                                            href={l.url}
+                                            className="text-center w-11"
+                                        >
+                                            <div className="text-sm text-dark-300 hover:underline">
+                                                {l.iconDecsShort}
+                                            </div>
+                                        </a>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>

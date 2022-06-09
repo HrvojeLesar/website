@@ -1,8 +1,87 @@
 import { IInfoCard } from "./IInfoCard";
+import PepegaPhone from "./Images/Pepegaphone";
+import MM from "./Images/mm.png";
+
+import { FaBook, FaGithub, FaGlobeEurope } from "react-icons/fa";
 
 import PATHFINDER from "./Images/pathfinder.png";
 
-export const projects: IInfoCard[] = [];
+export const projects: IInfoCard[] = [
+    {
+        title: "Kekov soundboard v2 - Beta",
+        description:
+            "Website for controlling a Discord bot that plays uploaded sounds.",
+        moreInfo:
+            "Website used to control a Discord bot made for playing short sounds. \
+                    Original version supported only one server, therefore v2 adds support \
+                    for multiple servers and an open API for making your own frontend.",
+        image: {
+            src: PepegaPhone(),
+            alt: "Kekov soundboard v2",
+        },
+        link: "https://betabot.hrveklesarov.com",
+        linkButtons: [
+            {
+                title: "Github repository",
+                url: "https://github.com/HrvojeLesar/kekov_soundboard_v2",
+                icon: FaGithub,
+                iconDecsShort: "Source code",
+            },
+        ],
+    },
+    {
+        title: "Undergraduate thesis",
+        description:
+            "Web application and separate rust library for solving \
+                assignment problems using the Hungarian method.",
+        note:"Thesis and website is only available in Croatian.",
+        image: {
+            src: MM,
+            alt: "Undergraduate thesis",
+        },
+        link: "https://hrveklesarov.com/madarska-metoda",
+        linkButtons: [
+            {
+                title: "Thesis repository",
+                url: "https://repozitorij.foi.unizg.hr/en/islandora/object/foi%3A7048",
+                icon: FaBook,
+                iconDecsShort: "Thesis pdf",
+            },
+            {
+                title: "Thesis website",
+                url: "https://hrveklesarov.com/madarska-metoda",
+                icon: FaGlobeEurope,
+                iconDecsShort: "Thesis website",
+            },
+            {
+                title: "Library source code",
+                url: "https://github.com/HrvojeLesar/madarska_metoda",
+                icon: FaGithub,
+                iconDecsShort: "Lib source",
+            },
+            {
+                title: "Website app source code",
+                url: "https://github.com/HrvojeLesar/zavrsni_web",
+                icon: FaGithub,
+                iconDecsShort: "Website source",
+            },
+        ],
+    },
+    {
+        title: "Mass balance evidention",
+        description: "",
+        image: { src: undefined, alt: "Mass balance evidention" },
+        link: "https://github.com/HrvojeLesar/Mass-balance-evidention",
+        linkButtons: [
+            {
+                title: "Source code",
+                url: "https://github.com/HrvojeLesar/Mass-balance-evidention",
+                icon: FaGithub,
+                iconDecsShort: "Source code",
+            },
+        ],
+    },
+];
 export const eveStuff: IInfoCard[] = [
     {
         title: "Pathfinder",
@@ -17,5 +96,19 @@ export const eveStuff: IInfoCard[] = [
             alt: "Pathfinder logo",
         },
         link: "https://pathfinder.hrveklesarov.com",
+        linkButtons: [
+            {
+                title: "Pathfinder source repository",
+                url: "https://github.com/exodus4d/pathfinder",
+                icon: FaGithub,
+                iconDecsShort: "Source code",
+            },
+            {
+                title: "Pathfinder website",
+                url: "https://pathfinder.hrveklesarov.com",
+                icon: FaGlobeEurope,
+                iconDecsShort: "Website",
+            },
+        ],
     },
 ];
