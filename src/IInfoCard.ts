@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { IconType } from "react-icons";
 
-export type IInfoCard = {
+export interface IInfoCard {
     title: string;
     description: string | ReactNode;
     moreInfo?: string | ReactNode;

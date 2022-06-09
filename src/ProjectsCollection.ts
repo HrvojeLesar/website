@@ -69,7 +69,7 @@ export const projects: IInfoCard[] = [
     },
     {
         title: "Mass balance evidention",
-        description: "",
+        description: "Nekaj o znidaricaj",
         image: { src: undefined, alt: "Mass balance evidention" },
         link: "https://github.com/HrvojeLesar/Mass-balance-evidention",
         linkButtons: [
