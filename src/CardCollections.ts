@@ -1,5 +1,5 @@
 import { CardCollectionProps } from "./CardCollection";
-import { eveStuff, projects } from "./ProjectsCollection";
+import { other, projects } from "./ProjectsCollection";
 
 export const cardCollections: CardCollectionProps[] = [
     {
@@ -7,7 +7,7 @@ export const cardCollections: CardCollectionProps[] = [
         cards: projects,
     },
     {
-        title: "Eve stuff",
-        cards: eveStuff,
+        title: "Other",
+        cards: other,
     },
 ];

@@ -5,6 +5,7 @@ import CardCollection from "./CardCollection";
 import { useState } from "react";
 import Navbar, { NavbarButton } from "./Navbar";
 import { cardCollections } from "./CardCollections";
+import { contactInfo } from "./ContactInfo";
 
 function App() {
     const [show, setShow] = useState(false);
@@ -15,14 +16,25 @@ function App() {
                 buttonsLeft={cardCollections.map((cc) => {
                     return (
                         <NavbarButton
-                            value={cc.title ?? ""}
+                            key={cc.title}
+                            value={cc.title ?? "#"}
                             url={`#${cc.title}`}
                         />
                     );
                 })}
+                buttonsRight={contactInfo.filter((ci) => { return ci.type !== "E-Mail"}).map((ci) => {
+                        return (
+                        <NavbarButton
+                            key={ci.type}
+                            value={ci.type}
+                            url={ci.url ?? "#"}
+                            icon={ci.icon}
+                        />
+                        );
+                    })}
             />
             {cardCollections.map((cc) => {
-                return <CardCollection title={cc.title} cards={cc.cards} />;
+                return <CardCollection key={cc.title} title={cc.title} cards={cc.cards} />;
             })}
             <Divider />
             <button onClick={() => setShow(!show)}>Show feedboard</button>

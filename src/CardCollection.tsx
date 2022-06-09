@@ -2,7 +2,7 @@ import { IInfoCard } from "./IInfoCard";
 import InfoCard from "./InfoCard";
 
 export type CardCollectionProps = {
-    title?: string;
+    title: string;
     cards: IInfoCard[];
 };
 

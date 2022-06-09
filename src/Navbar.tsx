@@ -1,18 +1,28 @@
 import { ReactNode } from "react";
+import { IconType } from "react-icons";
 
 type NavbarButtonProps = {
+    icon?: IconType;
     value: string;
     url: string;
 };
 
-export function NavbarButton({ value, url }: NavbarButtonProps) {
+
+export function NavbarButton({ value, url, icon }: NavbarButtonProps) {
     return (
+    <>
         <a
             className="hover:bg-dark-500 rounded text-white p-3 box-content"
             href={url}
         >
-            {value}
+        {icon ? (
+                <div className="flex gap-2 justify-center items-center">
+                {icon ? (icon({size: 28})) : (<></>)}
+                {value}
+                </div>
+        ): (value)}
         </a>
+    </>
     );
 }
 
@@ -30,7 +40,7 @@ export default function Navbar({ buttonsLeft, buttonsRight }: NavbarProps) {
                 <></>
             )}
             {buttonsRight ? (
-                <div className="flex gap-2">{buttonsLeft}</div>
+                <div className="flex gap-2">{buttonsRight}</div>
             ) : (
                 <></>
             )}
