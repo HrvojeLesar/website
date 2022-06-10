@@ -7,6 +7,7 @@ export default function Footer() {
             <Divider />
             <div className="flex items-center justify-between flex-wrap overflow-x-hidden gap-y-4 pt-1">
                 <div>A really amazing footer.</div>
+                <div>Made by <div className="inline-block italic font-semibold">Hrvoje Lesar</div></div>
                 <div className="flex items-center gap-x-3 flex-wrap">
                     {contactInfo.map((ci) => {
                         if (ci.type === "E-Mail") {
