@@ -35,12 +35,12 @@ export default function Navbar({ buttonsLeft, buttonsRight }: NavbarProps) {
     return (
         <div className="sticky top-0 left-0 flex justify-between p-2 bg-black opacity-70 overflow-x-hidden">
             {buttonsLeft ? (
-                <div className="flex gap-2">{buttonsLeft}</div>
+                <div className="flex gap-2 flex-wrap">{buttonsLeft}</div>
             ) : (
                 <></>
             )}
             {buttonsRight ? (
-                <div className="flex gap-2">{buttonsRight}</div>
+                <div className="flex gap-2 flex-wrap">{buttonsRight}</div>
             ) : (
                 <></>
             )}

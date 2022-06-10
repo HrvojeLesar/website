@@ -123,7 +123,7 @@ export const other: IInfoCard[] = [
         title: "Pathfinder",
         description: "Pathfinder is a mapping tool for Eve Online.",
         moreInfo:
-            "Official Pathfinder website is down and most others requires you to be a part of their alliance or corporation, so I decided to host my own. As is tradition this requires you to be a port of Fifty Fifty Fifty corporation.",
+            "Official Pathfinder website is down and most others requires you to be a part of their alliance or corporation, so I decided to host my own instance. As is tradition this requires you to be a port of Fifty Fifty Fifty corporation.",
         image: {
             src: PATHFINDER,
             alt: "Pathfinder logo",
