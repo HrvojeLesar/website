@@ -5,45 +5,16 @@ import MM from "../Images/mm.png";
 import { FaBook, FaGithub, FaGlobeEurope } from "react-icons/fa";
 
 import PATHFINDER from "../Images/pathfinder.png";
+import MBE from "../Images/MBE.png";
 import AocLogo from "../Components/AoCLogo";
 
 export const projects: IInfoCard[] = [
     {
-        title: "Kekov soundboard v2 - Beta",
-        description:
-            "Website for controlling a Discord bot that plays uploaded sounds.",
-        moreInfo:
-            "Website used to control a Discord bot made for playing short sounds. Original version supported only one server, therefore v2 adds support for multiple servers and an open API for making your own frontend.",
-        image: {
-            src: PepegaPhone(),
-            alt: "Kekov soundboard v2",
-        },
-        link: "https://betabot.hrveklesarov.com",
-        linkButtons: [
-            {
-                title: "Website",
-                url: "https://betabot.hrveklesarov.com",
-                icon: FaGlobeEurope,
-                iconDecsShort: "Website",
-            },
-            {
-                title: "Github repository",
-                url: "https://github.com/HrvojeLesar/kekov_soundboard_v2",
-                icon: FaGithub,
-                iconDecsShort: "Source code",
-            },
-            {
-                title: "Website v1",
-                url: "https://bot.hrveklesarov.com",
-                icon: FaGlobeEurope,
-                iconDecsShort: "V1 website",
-            },
-        ],
-    },
-    {
         title: "Undergraduate thesis",
         description:
             "Web application and separate rust library for solving assignment problems using the Hungarian method.",
+        moreInfo:
+            "Thesis goes into more detail about assignment problems and methods and algorithms used to solve them. Hungarian method is one of the algorithms used to solve the problem and it's implemented as a rust library and used in a web application.",
         note: "Thesis and website is only available in Croatian.",
         image: {
             src: MM,
@@ -78,9 +49,56 @@ export const projects: IInfoCard[] = [
         ],
     },
     {
+        title: "Kekov soundboard v2 - Beta",
+        description:
+            "Website for controlling a Discord bot that plays uploaded sounds.",
+        moreInfo:
+            "Website used to control a Discord bot made for playing short sounds. Original version supported only one server, therefore v2 adds support for multiple servers and an open API for making your own frontend.",
+        note: "Not all features are done or available. Bot invitation to discord servers is disabled.",
+        image: {
+            src: PepegaPhone(),
+            alt: "Kekov soundboard v2",
+        },
+        link: "https://betabot.hrveklesarov.com",
+        linkButtons: [
+            {
+                title: "Website",
+                url: "https://betabot.hrveklesarov.com",
+                icon: FaGlobeEurope,
+                iconDecsShort: "Website",
+            },
+            {
+                title: "Github repository",
+                url: "https://github.com/HrvojeLesar/kekov_soundboard_v2",
+                icon: FaGithub,
+                iconDecsShort: "Source code",
+            },
+            {
+                title: "Website v1",
+                url: "https://bot.hrveklesarov.com",
+                icon: FaGlobeEurope,
+                iconDecsShort: "V1 website",
+            },
+        ],
+    },
+    {
         title: "Mass balance evidention",
-        description: "Nekaj o znidaricaj",
-        image: { src: undefined, alt: "Mass balance evidention" },
+        description:
+            "Electron-React application for keeping track of agricultural parcels and crops",
+        moreInfo: (
+            <>
+                Application made for{" "}
+                <a
+                    href="https://www.instagram.com/poznidaric"
+                    className="hover:underline text-dark-50 italic"
+                >
+                    PO Žnidarić
+                </a>{" "}
+                to make it easier to keep track of crops on each agricultural
+                parcel.
+            </>
+        ),
+        image: { src: MBE, alt: "Mass balance evidention" },
         link: "https://github.com/HrvojeLesar/Mass-balance-evidention",
         linkButtons: [
             {

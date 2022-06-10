@@ -1,5 +1,6 @@
 import CardCollection from "./Components/CardCollection";
 import Divider from "./Components/Divider";
+import FeedBoard from "./Components/FeedBoard";
 import Footer from "./Components/Footer";
 import Navbar, { NavbarButton } from "./Components/Navbar";
 import { cardCollections } from "./Data/CardCollections";
@@ -38,6 +39,7 @@ function App() {
                     />
                 );
             })}
+            <FeedBoard />
             <Footer />
         </>
     );

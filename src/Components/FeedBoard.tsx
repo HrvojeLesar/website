@@ -51,7 +51,7 @@ type NameProps = {
 
 function Name({ name, pilotId }: NameProps) {
     return (
-        <div className="py-1 text-ellipsis overflow-hidden text-center text-gray-200 whitespace-nowrap">
+        <div className="py-1 text-ellipsis overflow-hidden text-center text-dark-50 whitespace-nowrap">
             <a
                 href={`https://zkillboard.com/character/${pilotId}`}
                 className="hover:underline"
@@ -66,13 +66,15 @@ type ImageProps = {
     killmail: Killmail;
 };
 
+const formatter = Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 2 });
+
 function Image({ killmail }: ImageProps) {
     return (
         <div
             className={
                 killmail.attacker.corporation_id === 98684728
-                    ? "p-4 bg-green-900"
-                    : "p-4 bg-red-900"
+                    ? "px-5 pt-5 bg-green-900 rounded"
+                    : "px-5 pt-5 bg-red-900 rounded"
             }
         >
             <a
@@ -85,6 +87,9 @@ function Image({ killmail }: ImageProps) {
                     alt="Image of a ship"
                 />
             </a>
+            <div className="pt text-white text-center text-ellipsis whitespace-nowrap overflow-hidden">
+            {`${formatter.format(killmail.zKillmail.zkb.totalValue)} ISK`}
+            </div>
         </div>
     );
 }
@@ -95,7 +100,7 @@ type FeedProps = {
 
 function Feed({ killmail }: FeedProps) {
     return (
-        <div className="rounded w-40 border-gray-600 flex-grow-0 flex-shrink-0 ">
+        <div className="rounded w-40 border-gray-600 flex-grow-0 flex-shrink-0">
             <Name
                 name={killmail.attacker.name}
                 pilotId={killmail.attacker.id}
@@ -187,7 +192,6 @@ export default function FeedBoard() {
     useEffect(() => {
         fetchCorpZKill().then((resp) => {
             if (resp) {
-                console.log(resp);
                 setKills(
                     resp.filter((km) => {
                         return km;
@@ -198,12 +202,12 @@ export default function FeedBoard() {
     }, []);
 
     return (
-    <div className="mx-8">
-        <div className="flex flex-nowrap gap-8 overflow-x-auto">
-            {kills.map((k) => {
-                return <Feed killmail={k} key={k.zKillmail.killmail_id} />;
-            })}
+        <div className="mx-16 my-4">
+            <div className="flex flex-nowrap gap-8 overflow-x-auto p-4">
+                {kills.map((k) => {
+                    return <Feed killmail={k} key={k.zKillmail.killmail_id} />;
+                })}
+            </div>
         </div>
-    </div>
     );
 }

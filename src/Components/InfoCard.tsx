@@ -64,30 +64,20 @@ export default function InfoCard({ infoCard, reverse }: InfoCardProps) {
                         <div className="flex flex-row gap-4 pt-4">
                             {infoCard.linkButtons?.map((l) => {
                                 return (
-                                    <div
+                                    <a
                                         key={l.title}
-                                        className="grid grid-rows-2 gap-1"
+                                        title={l.title}
+                                        href={l.url}
+                                        className="grid grid-rows-2 gap-1 group"
                                     >
-                                        <a
-                                            title={l.title}
-                                            href={l.url}
-                                            className="justify-self-center"
-                                        >
-                                            <l.icon
-                                                size={42}
-                                                className="ease-in-out duration-150 hover:fill-gray-500"
-                                            />
-                                        </a>
-                                        <a
-                                            title={l.title}
-                                            href={l.url}
-                                            className="text-center w-11"
-                                        >
-                                            <div className="text-sm text-dark-300 hover:underline">
-                                                {l.iconDecsShort}
-                                            </div>
-                                        </a>
-                                    </div>
+                                        <l.icon
+                                            size={42}
+                                            className="ease-in-out duration-150 group-hover:fill-gray-500"
+                                        />
+                                        <div className="text-sm text-dark-300 text-center w-11 group-hover:underline">
+                                            {l.iconDecsShort}
+                                        </div>
+                                    </a>
                                 );
                             })}
                         </div>
