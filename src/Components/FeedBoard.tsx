@@ -66,7 +66,10 @@ type ImageProps = {
     killmail: Killmail;
 };
 
-const formatter = Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 2 });
+const formatter = Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: 2,
+});
 
 function Image({ killmail }: ImageProps) {
     return (
@@ -88,7 +91,7 @@ function Image({ killmail }: ImageProps) {
                 />
             </a>
             <div className="pt text-white text-center text-ellipsis whitespace-nowrap overflow-hidden">
-            {`${formatter.format(killmail.zKillmail.zkb.totalValue)} ISK`}
+                {`${formatter.format(killmail.zKillmail.zkb.totalValue)} ISK`}
             </div>
         </div>
     );
@@ -202,12 +205,19 @@ export default function FeedBoard() {
     }, []);
 
     return (
-        <div className="mx-16 my-4">
+        <div className="mx-16 my-4 overflow-x-hidden relative">
+            <div className="text-3xl md:text-4xl font-bold text-dark-50 pb-4">
+                Fifty Fifty Fifty Feedboard
+            </div>
+            <div className="text-xl md:text-2xl font-bold text-dark-100 pb-4">
+                Displaying last {MAXKILLMAILS} kills
+            </div>
             <div className="flex flex-nowrap gap-8 overflow-x-auto p-4">
                 {kills.map((k) => {
                     return <Feed killmail={k} key={k.zKillmail.killmail_id} />;
                 })}
             </div>
+        <div className="bg-[url('https://images.evetech.net/corporations/98684728/logo?size=256')] bg-no-repeat bg-center bg-contain w-full h-full absolute opacity-10 top-0 left-0 -z-50"></div>
         </div>
     );
 }
