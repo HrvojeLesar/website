@@ -75,9 +75,9 @@ function Image({ killmail }: ImageProps) {
     return (
         <div
             className={
-                killmail.attacker.corporation_id === 98684728
-                    ? "px-5 pt-5 bg-green-900 rounded"
-                    : "px-5 pt-5 bg-red-900 rounded"
+                killmail.victim.corporation_id === 98684728
+                    ? "px-5 pt-5 bg-red-900 rounded"
+                    : "px-5 pt-5 bg-green-900 rounded"
             }
         >
             <a
