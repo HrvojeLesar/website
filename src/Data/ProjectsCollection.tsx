@@ -10,6 +10,39 @@ import AocLogo from "../Components/AoCLogo";
 
 export const projects: IInfoCard[] = [
     {
+        title: "Kekov soundboard v2 - Beta",
+        description:
+            "Website for controlling a Discord bot that plays uploaded sounds.",
+        moreInfo:
+            "Website used to control a Discord bot made for playing short sounds. Original version supported only one server, therefore v2 adds support for multiple servers and an open API for making your own frontend.",
+        note: "Not all features are done or available. Sound file upload limited to certain users, public sounds are available.",
+        image: {
+            src: PepegaPhone(),
+            alt: "Kekov soundboard v2",
+        },
+        link: "https://bot.hrveklesarov.com",
+        linkButtons: [
+            {
+                title: "Website",
+                url: "https://bot.hrveklesarov.com",
+                icon: FaGlobeEurope,
+                iconDecsShort: "Website",
+            },
+            {
+                title: "Github repository",
+                url: "https://github.com/HrvojeLesar/kekov_soundboard_v2",
+                icon: FaGithub,
+                iconDecsShort: "Source code",
+            },
+            {
+                title: "Website v1",
+                url: "https://oldbot.hrveklesarov.com",
+                icon: FaGlobeEurope,
+                iconDecsShort: "V1 website",
+            },
+        ],
+    },
+    {
         title: "Undergraduate thesis",
         description:
             "Web application and separate rust library for solving assignment problems using the Hungarian method.",
@@ -49,39 +82,6 @@ export const projects: IInfoCard[] = [
         ],
     },
     {
-        title: "Kekov soundboard v2 - Beta",
-        description:
-            "Website for controlling a Discord bot that plays uploaded sounds.",
-        moreInfo:
-            "Website used to control a Discord bot made for playing short sounds. Original version supported only one server, therefore v2 adds support for multiple servers and an open API for making your own frontend.",
-        note: "Not all features are done or available. Bot invitation to discord servers is disabled.",
-        image: {
-            src: PepegaPhone(),
-            alt: "Kekov soundboard v2",
-        },
-        link: "https://betabot.hrveklesarov.com",
-        linkButtons: [
-            {
-                title: "Website",
-                url: "https://betabot.hrveklesarov.com",
-                icon: FaGlobeEurope,
-                iconDecsShort: "Website",
-            },
-            {
-                title: "Github repository",
-                url: "https://github.com/HrvojeLesar/kekov_soundboard_v2",
-                icon: FaGithub,
-                iconDecsShort: "Source code",
-            },
-            {
-                title: "Website v1",
-                url: "https://bot.hrveklesarov.com",
-                icon: FaGlobeEurope,
-                iconDecsShort: "V1 website",
-            },
-        ],
-    },
-    {
         title: "Mass balance evidention",
         description:
             "Electron-React application for keeping track of agricultural parcels and crops",
@@ -108,7 +108,7 @@ export const projects: IInfoCard[] = [
                 iconDecsShort: "Source code",
             },
         ],
-    },
+    }
 ];
 
 export const other: IInfoCard[] = [
