@@ -135,6 +135,12 @@ export const other: IInfoCard[] = [
                 icon: FaGithub,
                 iconDecsShort: "AoC 2021",
             },
+            {
+                title: "Advent of Code 2022 - My solutions",
+                url: "https://github.com/HrvojeLesar/AoC2022",
+                icon: FaGithub,
+                iconDecsShort: "AoC 2022",
+            },
         ],
     },
     {

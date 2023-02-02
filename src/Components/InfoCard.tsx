@@ -72,7 +72,7 @@ export default function InfoCard({ infoCard, reverse }: InfoCardProps) {
                                     >
                                         <l.icon
                                             size={42}
-                                            className="ease-in-out duration-150 group-hover:fill-gray-500"
+                                            className="ease-in-out duration-150 group-hover:fill-gray-500 justify-self-center"
                                         />
                                         <div className="text-sm text-dark-300 text-center w-11 group-hover:underline">
                                             {l.iconDecsShort}
