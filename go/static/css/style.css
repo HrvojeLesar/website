@@ -1,9 +1,11 @@
 :root {
     --bg-dark-400: rgb(55 58 64);
     --bg-dark-500: rgb(44 46 51);
+    --bg-dark-700: rgb(193 194 197);
     --text-dark-50: rgb(193 194 197);
     --text-dark-200: rgb(144 146 150);
     --text-dark-300: rgb(92 95 102);
+    --fill-gray-500: #adb5bd;
 }
 
 html {
@@ -30,42 +32,56 @@ body {
 }
 
 .navbar {
+    /* top: 0; */
+    /* left: 0; */
+    /* position: sticky; */
     display: flex;
-    justify-content: space-between;
     padding: 0.5rem;
-    position: sticky;
+    justify-content: space-between;
     background: black;
     opacity: .7;
-    top: 0;
-    left: 0;
 }
 
 .navbar-items {
+    padding: 0.75rem;
+    display: flex;
     flex-wrap: wrap;
 }
 
 .navbar-item {
     padding: 0.75rem;
     border-radius: 0.25rem;
+    color: rgb(255 255 255);
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
 }
 
-.section {
-    /* background-color: black; */
+.navbar-item:hover {
+    background-color: var(--bg-dark-500);
+}
+
+.navbar-item-icon {
+    fill: white;
 }
 
 .section-title {
     margin: 0rem 8rem;
-    padding: 16px 16px 16px 16px;
+    padding: 16px 24px 16px 24px;
     color: var(--text-dark-50);
     font-weight: 700;
     font-size: 3.75rem;
 }
 
-@media only screen and (max-width: 700px) {
-    .section-title {
-        font-size: 3rem;
-        margin: 0rem 4rem;
-    }
+.section-title a {
+    color: var(--text-dark-50);
+    text-decoration: none;
+}
+.section-title a:hover {
+    text-decoration: underline;
 }
 
 .subsection {
@@ -82,19 +98,16 @@ body {
     flex-wrap: nowrap;
 }
 
+.subsection-item {
+    flex: 1 1;
+}
+
 .subsection-text-container {
     order: 1;
 }
 
-.section-image {
+.subsection-image {
     order: 2;
-}
-
-@media only screen and (max-width: 700px) {
-    .subsection-container {
-        flex-wrap: wrap;
-        margin: 0rem 4rem;
-    }
 }
 
 .subsection:nth-child(odd) {
@@ -105,16 +118,28 @@ body {
 }
 
 @media only screen and (max-width: 700px) {
+    .subsection-container {
+        flex-wrap: wrap;
+        margin: 0rem 4rem;
+    }
+
     .subsection-text-container {
         order: 1;
     }
-}
 
-@media only screen and (max-width: 700px) {
     .subsection:nth-child(odd) {
         .subsection-text-container {
             order: 1;
         }
+    }
+
+    .section-title {
+        font-size: 3rem;
+        margin: 0rem 4rem;
+    }
+
+    .footer {
+        margin: 0rem 4rem;
     }
 }
 
@@ -122,6 +147,14 @@ body {
     font-weight: 700;
     font-size: 2.25rem;
     color: var(--text-dark-50);
+}
+
+.subsection-title a {
+    color: var(--text-dark-50);
+    text-decoration: none;
+}
+.subsection-title a:hover {
+    text-decoration: underline;
 }
 
 .subsection-short {
@@ -148,6 +181,8 @@ body {
 .subsection-link-container {
     padding-top: 1rem;
     display: flex;
+    gap: 1rem;
+    color: var(--text-dark-300);
 }
 
 .subsection-link-item {
@@ -155,18 +190,62 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-decoration: none;
+    text-decoration-color: var(--text-dark-300);
+}
+
+.subsection-link-item:hover {
+    fill: var(--fill-gray-500);
+    text-decoration: underline;
+    transition: ease .2s;
+    text-decoration-color: var(--text-dark-300);
 }
 
 .subsection-link-icon {
     height: 48px;
     width: 48px;
-    transition: ease .2s;
 }
-
-.subsection-link-icon:hover {
-    fill: red;
-}
-
 
 .subsection-link-url {
+    text-decoration: none;
+    font-size: 0.875rem;
+    color: var(--text-dark-300);
+}
+
+.footer {
+    margin: 0rem 8rem;
+    padding: 16px;
+    color: var(--text-dark-50);
+}
+
+.divider {
+    border-width: 0.0625rem 0px 0px;
+    border-top-style: solid;
+    border-radius: 0.25rem;
+    margin: 0.75rem 0px;
+}
+
+.footer-items {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.footer-icon-container {
+    display: flex;
+    column-gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.footer-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-dark-50);
+}
+
+.made-by {
+    display: inline-block;
+    font-style: italic;
+    font-weight: 600;
 }
