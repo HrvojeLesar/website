@@ -22,5 +22,9 @@
     {
         "name": "globe",
         "file": "earth-europe-solid.svg"
+    },
+    {
+        "name": "book",
+        "file": "book-solid.svg"
     }
 ]

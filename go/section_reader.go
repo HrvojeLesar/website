@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"os"
 	"sort"
@@ -16,7 +17,7 @@ type Section struct {
 type Subsection struct {
 	Title     SubsectionTitle  `json:"title"`
 	ShortText *string          `json:"short_text"`
-	MainText  *string          `json:"main_text"`
+	MainText  *template.HTML   `json:"main_text"`
 	NoteText  *string          `json:"note_text"`
 	Image     *Image           `json:"image"`
 	Links     []SubsectionLink `json:"links"`

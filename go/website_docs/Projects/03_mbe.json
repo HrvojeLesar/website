@@ -1,0 +1,21 @@
+{
+    "title": {
+        "title": "Mass balance evidention",
+        "url": "https://github.com/HrvojeLesar/zavrsni_web"
+    },
+    "short_text": "Electron-React application for keeping track of agricultural parcels and crops",
+    "main_text": "Application made for <a href=\"https://www.instagram.com/poznidaric\" class=\"text-url\">PO Žnidarić</a> to make it easier to keep track of crops on each agricultural parcel.",
+    "image": {
+        "src": "mbe-old.png",
+        "alt": "MBE",
+        "url": "https://github.com/HrvojeLesar/Mass-balance-evidention"
+    },
+    "links": [
+        {
+            "title": "Source code",
+            "text": "Source code",
+            "url": "https://github.com/HrvojeLesar/Mass-balance-evidention",
+            "icon": "github"
+        }
+    ]
+}

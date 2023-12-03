@@ -1,0 +1,40 @@
+{
+    "title": {
+        "title": "Undergraduate thesis",
+        "url": "https://hrveklesarov.com/madarska-metoda"
+    },
+    "short_text": "Web application and separate rust library for solving assignment problems using the Hungarian method.",
+    "main_text": "Thesis goes into more detail about assignment problems and methods and algorithms used to solve them. Hungarian method is one of the algorithms used to solve the problem and it's implemented as a rust library and used in a web application.",
+    "note_text": "Thesis and website is only available in Croatian.",
+    "image": {
+        "src": "thesis.png",
+        "alt": "Thesis",
+        "url": "https://hrveklesarov.com/madarska-metoda"
+    },
+    "links": [
+        {
+            "title": "Thesis website",
+            "text": "Thesis website",
+            "url": "https://hrveklesarov.com/madarska-metoda",
+            "icon": "globe"
+        },
+        {
+            "title": "Thesis pdf",
+            "text": "Thesis pdf",
+            "url": "https://repozitorij.foi.unizg.hr/en/islandora/object/foi%3A7048",
+            "icon": "book"
+        },
+        {
+            "title": "Lib source",
+            "text": "Lib source",
+            "url": "https://github.com/HrvojeLesar/madarska_metoda",
+            "icon": "github"
+        },
+        {
+            "title": "Website source",
+            "text": "Website source",
+            "url": "https://github.com/HrvojeLesar/zavrsni_web",
+            "icon": "github"
+        }
+    ]
+}

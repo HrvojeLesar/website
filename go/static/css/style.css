@@ -228,6 +228,12 @@ body {
     font-weight: 600;
 }
 
+.text-url {
+    font-style: italic;
+    text-decoration: underline;
+    color: var(--text-dark-50);
+}
+
 @media only screen and (max-width: 700px) {
     .subsection-container {
         flex-wrap: wrap;
