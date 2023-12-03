@@ -1,0 +1,22 @@
+{
+    "title": {
+        "title": "",
+        "url": ""
+    },
+    "short_text": "",
+    "main_text": "",
+    "note_text": "",
+    "image": {
+        "src": "",
+        "alt": "",
+        "url": ""
+    },
+    "links": [
+        {
+            "title": "",
+            "text": "",
+            "url": "",
+            "icon": ""
+        }
+    ]
+}

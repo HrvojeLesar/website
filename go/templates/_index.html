@@ -9,8 +9,7 @@
 </head>
 
 <body>
-    {{ $sections := .Sections }}
-    {{ $subsections := .Subsections }}
+    {{ $sections := . }}
     <div class="navbar">
         <div class="navbar-items">
             {{ range $sections }}
@@ -44,55 +43,57 @@
             </a>
         </div>
     </div>
-    {{ range $sections }}
+    {{ range $index, $section := $sections }}
+    {{ $subsections := $section.Subsections }}
+    {{ if $subsections }}
     <div id="{{ .Title }}" class="section">
         <div class="section-title">
-            <a href="#{{ .Title }}">{{ .Title }}</a>
+            <a href="#{{ $section.Title }}">{{ $section.Title }}</a>
         </div>
-        {{ range $subsections }}
+        {{ range $sIndex, $subsection := $subsections }}
         <div class="subsection">
             <div class="subsection-container">
                 <div class="subsection-text-container subsection-item">
                     <div class="subsection-title">
-                        <a href="https://bot.hrveklesarov.com/">
-                            Kekov soundboard v2 - Beta
+                        <a href="{{ $subsection.Title.Url }}">
+                            {{ $subsection.Title.Title }}
                         </a>
                     </div>
-                    <div class="subsection-short">Website for controlling a Discord bot that plays uploaded sounds.
+                    {{ if $subsection.ShortText }}
+                    <div class="subsection-short">
+                        {{ $subsection.ShortText }}
                     </div>
-                    <div class="subsection-main">Website used to control a Discord bot made for playing short sounds.
-                        Original
-                        version supported only one server, therefore v2 adds support for multiple servers and an open
-                        API
-                        for
-                        making your own frontend.</div>
-                    <div class="subsection-note">Note: Not all features are done or available. Sound file upload limited
-                        to
-                        certain users, public sounds are available.</div>
+                    {{ end }}
+                    {{ if $subsection.MainText }}
+                    <div class="subsection-main">
+                        {{ $subsection.MainText }}
+                    </div>
+                    {{ end }}
+                    {{ if $subsection.NoteText }}
+                    <div class="subsection-note">
+                        Note: {{ $subsection.NoteText }}
+                    </div>
+                    {{ end }}
+                    {{ if $subsection.Links }}
                     <div class="subsection-link-container">
-                        <a href="https://bot.hrveklesarov.com" class="subsection-link-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="subsection-link-icon"
-                                viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.-->
-                                <path
-                                    d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z" />
-                            </svg>
-                            <div class="subsection-link-url">Website</div>
+                        {{ range $linkIdx, $link := $subsection.Links }}
+                        <a href="{{ $link.Url }}" title="{{ $link.Title }}" class="subsection-link-item">
+                            <div class="subsection-link-icon">
+                                {{ $link.IconFile.FileContents }}
+                            </div>
+                            <div class="subsection-link-url">{{ $link.Text }}</div>
                         </a>
-                        <a href="https://bot.hrveklesarov.com" class="subsection-link-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="subsection-link-icon"
-                                viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.-->
-                                <path
-                                    d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z" />
-                            </svg>
-                            <div class="subsection-link-url">Website</div>
-                        </a>
+                        {{ end}}
                     </div>
+                    {{ end }}
                 </div>
-                <img class="subsection-image subsection-item" src="pepegaphone.svg" alt="Pepegaphone" />
+                <img class="subsection-image subsection-item" src="/static/images/{{ $subsection.Image.Src }}"
+                    alt="{{ $subsection.Image.Alt }}" />
             </div>
         </div>
         {{ end }}
     </div>
+    {{ end }}
     {{ end }}
 </body>
 

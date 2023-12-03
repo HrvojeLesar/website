@@ -162,10 +162,11 @@ body {
 .subsection-link-item {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     text-decoration: none;
     text-decoration-color: var(--text-dark-300);
+    gap: 0.25rem;
 }
 
 .subsection-link-item:hover {
@@ -182,8 +183,10 @@ body {
 
 .subsection-link-url {
     text-decoration: none;
+    text-align: center;
     font-size: 0.875rem;
     color: var(--text-dark-300);
+    width: 2.75rem;
 }
 
 .footer {
