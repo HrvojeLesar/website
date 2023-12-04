@@ -8,9 +8,10 @@ import (
 )
 
 func main() {
-	tmpl := template.Must(template.ParseFiles("templates/_index.html"))
-	sectionWrapper := newSenctions()
+    fmt.Println(fetchFiftyFiftyFiftyFeeds());
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles("templates/_index.html"))
+		sectionWrapper := newSenctions()
 		err := tmpl.Execute(w, sectionWrapper.Sections)
 		if err != nil {
 			panic(err)
