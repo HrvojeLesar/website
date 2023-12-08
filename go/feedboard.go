@@ -132,14 +132,22 @@ type PairedCharacters struct {
 }
 
 type Esi struct {
+	KillmailLimit            int
 	Killmails                []PairedKillmail
 	PairedKillmailCharacters []PairedKillmailCharacterId
 	PairedCharacters         []PairedCharacters
 }
 
+func newEsi(killmailLimit int) *Esi {
+	return &Esi{
+		KillmailLimit: killmailLimit,
+	}
+}
+
 func (e *Esi) fetchKillmails(zk Zkillboard) error {
+	killmails := make([]PairedKillmail, 0, e.KillmailLimit)
 	for idx := range zk.Killmails {
-		if len(e.Killmails) == 10 {
+		if len(killmails) == e.KillmailLimit {
 			break
 		}
 		zkillboardKillmail := &zk.Killmails[idx]
@@ -262,19 +270,23 @@ func (e *Esi) getCharacters() error {
 	return nil
 }
 
-func fetchFiftyFiftyFiftyFeeds() (*Esi, error) {
+func (e *Esi) fetchFiftyFiftyFiftyFeeds() error {
 	zkillboard := Zkillboard{CorporationId: 98684728}
 	err := zkillboard.fetchKillmails()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	esi := Esi{}
-
-	err = esi.fetchKillmails(zkillboard)
+	err = e.fetchKillmails(zkillboard)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &esi, nil
+	e.clear()
+	return nil
+}
+
+func (e *Esi) clear() {
+	e.PairedKillmailCharacters = nil
+	e.PairedCharacters = nil
 }

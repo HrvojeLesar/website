@@ -2,25 +2,38 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
+	"time"
+
+	"github.com/go-co-op/gocron"
+)
+
+const (
+	KILLMAILCOUNT int = 10
 )
 
 func main() {
-    fmt.Println(fetchFiftyFiftyFiftyFeeds());
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/_index.html"))
-		sectionWrapper := newSenctions()
-		err := tmpl.Execute(w, sectionWrapper.Sections)
+	esi := newEsi(KILLMAILCOUNT)
+	scheduler := gocron.NewScheduler(time.UTC)
+
+	scheduler.Every(10).Minutes().Do(func() {
+		log.Println("Fetching killmails")
+		err := esi.fetchFiftyFiftyFiftyFeeds()
 		if err != nil {
-			panic(err)
+			log.Println(err)
 		}
 	})
+
+	serveHandler := newServeHandler(esi)
+	http.HandleFunc("/", serveHandler.handle)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	fmt.Println("Listening on http://localhost:3000")
+
+	scheduler.StartAsync()
 	err := http.ListenAndServe(":3000", nil)
+	scheduler.Stop()
 	if err != nil {
 		log.Panic(err)
 	}

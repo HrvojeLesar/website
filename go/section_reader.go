@@ -42,7 +42,8 @@ type SubsectionLink struct {
 }
 
 type SectionsWrapper struct {
-	Sections []Section
+	Sections  []Section
+	Killmails []PairedKillmail
 }
 
 type Image struct {
@@ -51,8 +52,10 @@ type Image struct {
 	Url *string `json:"url"`
 }
 
-func newSenctions() SectionsWrapper {
-	sections := SectionsWrapper{}
+func newSections(killmails []PairedKillmail) SectionsWrapper {
+	sections := SectionsWrapper{
+		Killmails: killmails,
+	}
 	sections.readSections()
 	sections.applyIcons()
 	return sections
