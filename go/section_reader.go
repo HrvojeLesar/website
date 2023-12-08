@@ -9,6 +9,13 @@ import (
 	"sort"
 )
 
+type ImageType string
+
+const (
+	Img  ImageType = "image"
+	HTML           = "HTML"
+)
+
 type Section struct {
 	Title       string `json:"Title"`
 	Subsections []Subsection
@@ -47,9 +54,17 @@ type SectionsWrapper struct {
 }
 
 type Image struct {
-	Src *string `json:"src"`
-	Alt *string `json:"alt"`
-	Url *string `json:"url"`
+	Src  *template.HTML `json:"src"`
+	Alt  *string        `json:"alt"`
+	Url  *string        `json:"url"`
+	Type *string        `json:"type"`
+}
+
+func (i *Image) IsRawHTML() bool {
+	if i.Type == nil {
+		return false
+	}
+	return *i.Type == HTML
 }
 
 func newSections(killmails []FeedboardKillmail) SectionsWrapper {

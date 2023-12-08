@@ -123,7 +123,7 @@ type PairedKillmail struct {
 }
 
 func (pk *PairedKillmail) isWorthlessCapsule() bool {
-	return pk.EsiKillmail.Victim.ShipTypeId == Capsule && pk.ZkillboardKillmail.Zkb.FittedValue <= 10001
+	return pk.EsiKillmail.Victim.ShipTypeId == Capsule && pk.ZkillboardKillmail.Zkb.TotalValue <= 10001
 }
 
 func (pk *PairedKillmail) getCharacters() (*EsiCharacter, *EsiCharacter, error) {

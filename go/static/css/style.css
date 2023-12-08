@@ -45,6 +45,14 @@ a:hover {
     text-decoration: underline;
 }
 
+img {
+    max-width: 100%;
+}
+
+a.subsection-image:hover {
+    text-decoration: none;
+}
+
 .navbar {
     /* top: 0; */
     /* left: 0; */
@@ -115,7 +123,12 @@ a:hover {
 }
 
 .subsection-image {
+    align-self: center;
+    margin-right: auto;
+    margin-left: auto;
     order: 2;
+    display: flex;
+    justify-content: center;
 }
 
 .subsection:nth-child(odd) {
@@ -238,8 +251,11 @@ a:hover {
 .feedboard {
     position: relative;
     padding: 0rem 8rem;
+    padding: 16px 24px 16px 24px;
     margin-top: 1rem;
     margin-bottom: 1rem;
+    margin-right: 8rem;
+    margin-left: 8rem;
 }
 
 .feedboard-title {
@@ -248,10 +264,6 @@ a:hover {
     font-size: 2.25rem;
     color: var(--text-dark-50);
     text-decoration: none;
-}
-
-.feedboard-title:hover {
-    text-decoration: underline;
 }
 
 .feedboard-description {
@@ -328,14 +340,30 @@ a:hover {
     line-height: 1.5;
 }
 
+.aoc-logo {
+    text-shadow: rgb(0 204 0) 0px 0px 2px, rgb(0 204 0) 0px 0px 5px;
+    color: rgb(0 204 0);
+    font-size: 3.75rem;
+    line-height: 1;
+}
+
 @media only screen and (max-width: 700px) {
+    .section-title {
+        font-size: 3rem;
+        margin: 0rem 4rem;
+    }
+
     .subsection-container {
-        flex-wrap: wrap;
+        display: grid;
         margin: 0rem 4rem;
     }
 
     .subsection-text-container {
         order: 1;
+    }
+
+    .subsection-image {
+        justify-self: center;
     }
 
     .subsection:nth-child(odd) {
@@ -344,9 +372,9 @@ a:hover {
         }
     }
 
-    .section-title {
-        font-size: 3rem;
+    .feedboard {
         margin: 0rem 4rem;
+        padding: 16px 24px 16px 24px;
     }
 
     .footer {

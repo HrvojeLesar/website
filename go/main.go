@@ -22,8 +22,9 @@ func main() {
 		err := esi.fetchFiftyFiftyFiftyFeeds()
 		if err != nil {
 			log.Println(err)
+		} else {
+			log.Println("Fetching successful")
 		}
-        log.Println(esi.Killmails)
 	})
 
 	serveHandler := newServeHandler(esi)

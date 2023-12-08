@@ -6,9 +6,10 @@
     "short_text": "Advent of Code is an Advent calendar of small programming puzzles for a variety of skill sets and skill levels",
     "main_text": "Below are links to repositories for my solutions",
     "image": {
-        "src": "",
-        "alt": "",
-        "url": ""
+        "src": "<div class=\"aoc-logo\">Advent of Code</div>",
+        "alt": "Advent of Code",
+        "url": "https://adventofcode.com/",
+        "type": "HTML"
     },
     "links": [
         {

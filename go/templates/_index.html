@@ -87,8 +87,13 @@
                     </div>
                     {{ end }}
                 </div>
-                <img class="subsection-image subsection-item" src="/static/images/{{ $subsection.Image.Src }}"
-                    alt="{{ $subsection.Image.Alt }}" />
+                <a class="subsection-image subsection-item" href="{{ $subsection.Image.Url }}" target="_blank">
+                    {{ if $subsection.Image.IsRawHTML }}
+                        {{ $subsection.Image.Src }}
+                    {{ else }}
+                    <img src="/static/images/{{ $subsection.Image.Src }}" alt="{{ $subsection.Image.Alt }}" />
+                    {{ end }}
+                </a>
             </div>
         </div>
         {{ end }}
@@ -121,7 +126,7 @@
                             alt="Image of a ship">
                     </a>
                     <div class="feedboard-isk">
-                            {{ $feed.Isk }} ISK
+                        {{ $feed.Isk }} ISK
                     </div>
                 </div>
                 <div class="feedboard-character">
