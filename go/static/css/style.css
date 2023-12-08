@@ -11,6 +11,19 @@
     --bg-red-900: rgb(201 42 42);
     --bg-green-900: rgb(43 138 62);
     --text-white: rgb(255 255 255);
+    color-scheme: dark;
+}
+
+html.light {
+    --bg-dark-400: rgb(255 255 255);
+    --bg-dark-500: rgb(231 231 231);
+    --bg-dark-700: rgb(200 200 200);
+    --text-dark-50: rgb(0 0 0);
+    --text-dark-100: rgb(12 12 21);
+    --text-dark-200: rgb(52 52 52);
+    --text-dark-300: rgb(88 88 88);
+    --fill-gray-500: #5b5b5b;
+    color-scheme: light;
 }
 
 html {
@@ -148,7 +161,7 @@ a.subsection-image:hover {
 .subsection-short {
     padding-top: 0.25rem;
     font-size: 1.25rem;
-    color: var(--text-dark-200);
+    color: var(--text-dark-100);
 }
 
 .subsection-title,.subsection-short {
