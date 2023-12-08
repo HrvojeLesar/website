@@ -41,6 +41,10 @@ a {
     text-decoration: inherit;
 }
 
+a:hover {
+    text-decoration: underline;
+}
+
 .navbar {
     /* top: 0; */
     /* left: 0; */
@@ -72,6 +76,7 @@ a {
 
 .navbar-item:hover {
     background-color: var(--bg-dark-500);
+    text-decoration: none;
 }
 
 .navbar-item-icon {
@@ -85,10 +90,6 @@ a {
     font-weight: 700;
     font-size: 3.75rem;
     text-decoration: none;
-}
-
-.section-title:hover {
-    text-decoration: underline;
 }
 
 .subsection {
@@ -129,10 +130,6 @@ a {
     font-size: 2.25rem;
     color: var(--text-dark-50);
     text-decoration: none;
-}
-
-.subsection-title:hover {
-    text-decoration: underline;
 }
 
 .subsection-short {
@@ -300,10 +297,6 @@ a {
     text-decoration: none;
 }
 
-.feedboard-character:hover {
-    text-decoration: underline;
-}
-
 .feedboard-kills-item-image-container {
     padding-top: 1.25rem;
     padding-left: 1.25rem;
@@ -321,7 +314,7 @@ a {
     margin-right: auto;
 }
 
-.feedboard-kills-item-image,a,img {
+.feedboard-kills-item-image img {
     display: block;
     border-radius: 0.25rem;
 }

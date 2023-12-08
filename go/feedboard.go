@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/nkall/compactnumber"
 )
 
 const (
@@ -18,6 +20,8 @@ const (
 	AcceptEncodingValue    = "gzip"
 	Capsule                = 670
 )
+
+var formatter = compactnumber.NewFormatter("en-UK", compactnumber.Short)
 
 func esiKillmailEndpoint(killmailid int64, hash string) string {
 	return fmt.Sprintf("https://esi.evetech.net/latest/killmails/%d/%s/?datasource=tranquility", killmailid, hash)
@@ -108,34 +112,74 @@ func (ek *EsiKillmail) findFinalBlowCharacter() (int64, error) {
 }
 
 type EsiCharacter struct {
+	Id            int64
 	Name          string `json:"name"`
 	CorporationId int64  `json:"corporation_id"`
 }
 
 type PairedKillmail struct {
-	EsiKillmail        EsiKillmail
-	ZkillboardKillmail ZkillboardKillmail
+	EsiKillmail        *EsiKillmail
+	ZkillboardKillmail *ZkillboardKillmail
 }
 
-type PairedKillmailCharacterId struct {
-	FinalBlowCharId int64
-	VictimCharId    int64
-	PairdKillmail   PairedKillmail
+func (pk *PairedKillmail) isWorthlessCapsule() bool {
+	return pk.EsiKillmail.Victim.ShipTypeId == Capsule && pk.ZkillboardKillmail.Zkb.FittedValue <= 10001
 }
 
-type PairedCharacters struct {
-	FinalBlowChar   EsiCharacter
-	VictimChar      EsiCharacter
-	FinalBlowCharId int64
-	VictimCharId    int64
-	PairdKillmail   PairedKillmail
+func (pk *PairedKillmail) getCharacters() (*EsiCharacter, *EsiCharacter, error) {
+	if pk.ZkillboardKillmail.Zkb.Npc {
+		return nil, nil, errors.New("Npc kill")
+	}
+
+	victimCharId := pk.EsiKillmail.Victim.CharacterId
+	finalBlowCharacterId, err := pk.EsiKillmail.findFinalBlowCharacter()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	victim, err := fetchCharacter(victimCharId)
+	if err != nil {
+		return nil, nil, err
+	}
+	finalBlowCharacter, err := fetchCharacter(finalBlowCharacterId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return victim, finalBlowCharacter, nil
+}
+
+type FeedboardKillmail struct {
+	CorporationId int64
+	Killmail      PairedKillmail
+	Victim        EsiCharacter
+	FinalBlow     EsiCharacter
+}
+
+func (fk *FeedboardKillmail) KillmailId() int64 {
+	return fk.Killmail.ZkillboardKillmail.KillmailId
+}
+
+func (fk *FeedboardKillmail) ShipTypeId() int64 {
+	return fk.Killmail.EsiKillmail.Victim.ShipTypeId
+}
+
+func (fk *FeedboardKillmail) IsKill() bool {
+	return fk.Victim.CorporationId != fk.CorporationId
+}
+
+func (fk *FeedboardKillmail) Isk() string {
+	iskValue, err := formatter.Format(int(fk.Killmail.ZkillboardKillmail.Zkb.TotalValue))
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return iskValue
 }
 
 type Esi struct {
-	KillmailLimit            int
-	Killmails                []PairedKillmail
-	PairedKillmailCharacters []PairedKillmailCharacterId
-	PairedCharacters         []PairedCharacters
+	KillmailLimit int
+	Killmails     []FeedboardKillmail
 }
 
 func newEsi(killmailLimit int) *Esi {
@@ -145,7 +189,7 @@ func newEsi(killmailLimit int) *Esi {
 }
 
 func (e *Esi) fetchKillmails(zk Zkillboard) error {
-	killmails := make([]PairedKillmail, 0, e.KillmailLimit)
+	killmails := make([]FeedboardKillmail, 0, e.KillmailLimit)
 	for idx := range zk.Killmails {
 		if len(killmails) == e.KillmailLimit {
 			break
@@ -154,120 +198,77 @@ func (e *Esi) fetchKillmails(zk Zkillboard) error {
 		requestUrl := esiKillmailEndpoint(zkillboardKillmail.KillmailId, zkillboardKillmail.Zkb.Hash)
 		request, err := http.NewRequest(http.MethodGet, requestUrl, nil)
 		if err != nil {
-			return err
+			return nil
 		}
 
 		response, err := http.DefaultClient.Do(request)
 		if err != nil {
-			return err
+			return nil
 		}
 
 		responseBodyBytes, err := io.ReadAll(response.Body)
 		if err != nil {
-			return err
+			return nil
 		}
 
 		var esiKillmail EsiKillmail
 		err = json.Unmarshal(responseBodyBytes, &esiKillmail)
 		if err != nil {
-			return err
+			return nil
 		}
 
 		pair := PairedKillmail{
-			EsiKillmail:        esiKillmail,
-			ZkillboardKillmail: *zkillboardKillmail,
+			EsiKillmail:        &esiKillmail,
+			ZkillboardKillmail: zkillboardKillmail,
 		}
 
-		if pair.EsiKillmail.Victim.ShipTypeId == Capsule && pair.ZkillboardKillmail.Zkb.FittedValue <= 10001 {
+		if pair.isWorthlessCapsule() {
 			continue
 		}
-		e.Killmails = append(e.Killmails, pair)
-	}
 
-	err := e.pairCharactersToKillmail()
-	if err != nil {
-		return err
-	}
-	err = e.getCharacters()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (e *Esi) pairCharactersToKillmail() error {
-	e.PairedKillmailCharacters = make([]PairedKillmailCharacterId, 0, len(e.Killmails))
-	for idx := range e.Killmails {
-		pair := &e.Killmails[idx]
-		if pair.ZkillboardKillmail.Zkb.Npc {
-			continue
-		}
-		victimCharId := pair.EsiKillmail.Victim.CharacterId
-		finalBlowCharacterId, err := pair.EsiKillmail.findFinalBlowCharacter()
+		victim, finalBlow, err := pair.getCharacters()
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 
-		e.PairedKillmailCharacters = append(e.PairedKillmailCharacters, PairedKillmailCharacterId{
-			VictimCharId:    victimCharId,
-			FinalBlowCharId: finalBlowCharacterId,
-			PairdKillmail:   *pair,
+		killmails = append(killmails, FeedboardKillmail{
+			CorporationId: zk.CorporationId,
+			Killmail:      pair,
+			Victim:        *victim,
+			FinalBlow:     *finalBlow,
 		})
 	}
+
+	e.Killmails = killmails
 
 	return nil
 }
 
-func (e *Esi) fetchCharacter(charId int64, character *EsiCharacter) error {
+func fetchCharacter(charId int64) (*EsiCharacter, error) {
+	character := EsiCharacter{Id: charId}
 	requestUrl := esiCharacterEndpoint(charId)
 
 	request, err := http.NewRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	responseBodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	err = json.Unmarshal(responseBodyBytes, character)
+	err = json.Unmarshal(responseBodyBytes, &character)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
-}
-
-func (e *Esi) getCharacters() error {
-	e.PairedCharacters = make([]PairedCharacters, 0, len(e.PairedKillmailCharacters))
-	for idx := range e.PairedKillmailCharacters {
-		killmailPair := &e.PairedKillmailCharacters[idx]
-		pairedCharacters := PairedCharacters{
-			FinalBlowCharId: killmailPair.FinalBlowCharId,
-			VictimCharId:    killmailPair.VictimCharId,
-			PairdKillmail:   killmailPair.PairdKillmail,
-		}
-
-		err := e.fetchCharacter(killmailPair.FinalBlowCharId, &pairedCharacters.FinalBlowChar)
-		if err != nil {
-			return err
-		}
-
-		e.fetchCharacter(killmailPair.VictimCharId, &pairedCharacters.VictimChar)
-		if err != nil {
-			return err
-		}
-
-		e.PairedCharacters = append(e.PairedCharacters, pairedCharacters)
-	}
-
-	return nil
+	return &character, nil
 }
 
 func (e *Esi) fetchFiftyFiftyFiftyFeeds() error {
@@ -282,11 +283,5 @@ func (e *Esi) fetchFiftyFiftyFiftyFeeds() error {
 		return err
 	}
 
-	e.clear()
 	return nil
-}
-
-func (e *Esi) clear() {
-	e.PairedKillmailCharacters = nil
-	e.PairedCharacters = nil
 }

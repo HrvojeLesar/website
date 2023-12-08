@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    {{ $sections := . }}
+    {{ $sections := .Sections }}
     <div class="navbar">
         <div class="navbar-items">
             {{ range $sections }}
@@ -95,238 +95,47 @@
     </div>
     {{ end }}
     {{ end }}
+
+    {{ $feedboard := .Killmails }}
+    {{ if $feedboard }}
     <div class="feedboard">
         <div class="feedboard-title">
             <a href="https://zkillboard.com/corporation/98684728/">
                 Fifty Fifty Fifty Feedboard
             </a>
         </div>
-        <div class="feedboard-description">Displaying last 10 kills</div>
+        <div class="feedboard-description">Displaying last {{ len $feedboard }} kills</div>
         <div class="feedboard-kills-container">
+            {{ range $fIndex, $feed := $feedboard }}
             <div class="feedboard-kills-item">
                 <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
+                    <a href="https://zkillboard.com/character/{{ $feed.FinalBlow.Id }}/" target="_blank">
+                        {{ $feed.FinalBlow.Name }}
                     </a>
                 </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
+                <div
+                    class="feedboard-kills-item-image-container {{ if $feed.IsKill }} feedboard-kill-green-bg {{ end }}">
+                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/{{ $feed.KillmailId }}"
+                        target="_blank">
+                        <img src="https://images.evetech.net/types/{{ $feed.ShipTypeId }}/render?size=128"
+                            alt="Image of a ship">
                     </a>
                     <div class="feedboard-isk">
-                        3.06B ISK
+                            {{ $feed.Isk }} ISK
                     </div>
                 </div>
                 <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
+                    <a href="https://zkillboard.com/character/{{ $feed.Victim.Id }}/" target="_blank">
+                        {{ $feed.Victim.Name }}
                     </a>
                 </div>
             </div>
-
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
-            <div class="feedboard-kills-item">
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2115014063/" target="_blank">
-                        wawi1
-                    </a>
-                </div>
-                <div class="feedboard-kills-item-image-container feedboard-kill-green-bg">
-                    <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/113748178" target="_blank">
-                        <img src="https://images.evetech.net/types/54733/render?size=128" alt="Image of a ship">
-                    </a>
-                    <div class="feedboard-isk">
-                        3.06B ISK
-                    </div>
-                </div>
-                <div class="feedboard-character">
-                    <a href="https://zkillboard.com/character/2118731769/" target="_blank">
-                        Pavel Vratisinski
-                    </a>
-                </div>
-            </div>
+            {{ end}}
         </div>
         <div class="feedboard-background-image"></div>
     </div>
+    {{ end}}
+
     <footer class="footer">
         <div class="divider"></div>
         <div class="footer-items">

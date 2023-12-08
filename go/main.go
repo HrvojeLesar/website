@@ -23,6 +23,7 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
+        log.Println(esi.Killmails)
 	})
 
 	serveHandler := newServeHandler(esi)
