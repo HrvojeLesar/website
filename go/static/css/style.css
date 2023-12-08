@@ -1,11 +1,16 @@
 :root {
     --bg-dark-400: rgb(55 58 64);
     --bg-dark-500: rgb(44 46 51);
-    --bg-dark-700: rgb(193 194 197);
+    --bg-dark-700: rgb(26 27 30);
     --text-dark-50: rgb(193 194 197);
+    --text-dark-100: rgb(166 167 171);
     --text-dark-200: rgb(144 146 150);
     --text-dark-300: rgb(92 95 102);
     --fill-gray-500: #adb5bd;
+
+    --bg-red-900: rgb(201 42 42);
+    --bg-green-900: rgb(43 138 62);
+    --text-white: rgb(255 255 255);
 }
 
 html {
@@ -29,6 +34,11 @@ html {
 body {
     margin: 0;
     background-color: var(--bg-dark-400);
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
 }
 
 .navbar {
@@ -74,13 +84,10 @@ body {
     color: var(--text-dark-50);
     font-weight: 700;
     font-size: 3.75rem;
-}
-
-.section-title a {
-    color: var(--text-dark-50);
     text-decoration: none;
 }
-.section-title a:hover {
+
+.section-title:hover {
     text-decoration: underline;
 }
 
@@ -121,13 +128,10 @@ body {
     font-weight: 700;
     font-size: 2.25rem;
     color: var(--text-dark-50);
-}
-
-.subsection-title a {
-    color: var(--text-dark-50);
     text-decoration: none;
 }
-.subsection-title a:hover {
+
+.subsection-title:hover {
     text-decoration: underline;
 }
 
@@ -190,9 +194,9 @@ body {
 }
 
 .footer {
-    margin: 0rem 8rem;
-    padding: 16px;
+    padding: 1rem 8rem;
     color: var(--text-dark-50);
+    background-color: var(--bg-dark-700);
 }
 
 .divider {
@@ -234,6 +238,103 @@ body {
     color: var(--text-dark-50);
 }
 
+.feedboard {
+    position: relative;
+    padding: 0rem 8rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.feedboard-title {
+    padding-bottom: 1rem;
+    font-weight: 700;
+    font-size: 2.25rem;
+    color: var(--text-dark-50);
+    text-decoration: none;
+}
+
+.feedboard-title:hover {
+    text-decoration: underline;
+}
+
+.feedboard-description {
+    font-size: 1.5rem;
+    color: var(--text-dark-100);
+    padding-bottom: 1rem;
+}
+
+.feedboard-background-image {
+    background-image: url(https://images.evetech.net/corporations/98684728/logo?size=256);
+    opacity: 0.1;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: contain;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: -50;
+}
+
+.feedboard-kills-container {
+    padding: 1rem;
+    overflow-x: auto;
+    gap: 2rem;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.feedboard-kills-item {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.feedboard-character {
+    text-align: center;
+    padding: 0.25rem 0rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--text-dark-50);
+    text-decoration: none;
+}
+
+.feedboard-character:hover {
+    text-decoration: underline;
+}
+
+.feedboard-kills-item-image-container {
+    padding-top: 1.25rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    border-radius: 0.25rem;
+    background-color: var(--bg-red-900);
+}
+
+.feedboard-kill-green-bg {
+    background-color: var(--bg-green-900);
+}
+
+.feedboard-kills-item-image {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feedboard-kills-item-image,a,img {
+    display: block;
+    border-radius: 0.25rem;
+}
+
+.feedboard-isk {
+    color: var(--text-white);
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
 @media only screen and (max-width: 700px) {
     .subsection-container {
         flex-wrap: wrap;
@@ -256,6 +357,6 @@ body {
     }
 
     .footer {
-        margin: 0rem 4rem;
+        padding: 1rem 4rem;
     }
 }
