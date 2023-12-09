@@ -8,12 +8,14 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/nkall/compactnumber"
 )
 
 const (
 	ZkillboardCorpEndpoint = "https://zkillboard.com/api/corporationID/"
+	ZkillboardKillEndpoint = "https://zkillboard.com/api/killID/"
 	UserAgentKey           = "User-Agent"
 	UserAgentValue         = "https://hrveklesarov.com/ Maintainer: Hrvoje (hrvoje.lesar1@hotmail.com)"
 	AcceptEncodingKey      = "Accept-Encoding"
@@ -31,7 +33,7 @@ func esiCharacterEndpoint(characterId int64) string {
 	return fmt.Sprintf("https://esi.evetech.net/latest/characters/%d/?datasource=tranquility", characterId)
 }
 
-type Zkillboard struct {
+type CorporationZkillboard struct {
 	CorporationId int64
 	Killmails     []ZkillboardKillmail
 }
@@ -52,11 +54,43 @@ type ZkillboardKillmail struct {
 	} `json:"zkb"`
 }
 
-func (zk *Zkillboard) requestUrl() string {
+func (zk *ZkillboardKillmail) fetchKillmail() error {
+	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%d/", ZkillboardKillEndpoint, zk.KillmailId), nil)
+	request.Header.Set(UserAgentKey, UserAgentValue)
+	request.Header.Set(AcceptEncodingKey, AcceptEncodingValue)
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return err
+	}
+
+	gzipReader, err := gzip.NewReader(response.Body)
+	if err != nil {
+		return err
+	}
+	defer gzipReader.Close()
+
+	responseBodyBytes, err := io.ReadAll(gzipReader)
+	if err != nil {
+		return err
+	}
+
+	// Zkillboard always returns an array even when fetching a single killmail
+	// TODO: https://zkillboard.com/api/killID/113897332/ amarr control tower
+	killmails := make([]ZkillboardKillmail, 0, 1)
+	err = json.Unmarshal(responseBodyBytes, &killmails)
+	if err != nil {
+		return err
+	}
+
+	zk.Zkb = killmails[0].Zkb
+	return nil
+}
+
+func (zk *CorporationZkillboard) requestUrl() string {
 	return fmt.Sprintf("%s%d/", ZkillboardCorpEndpoint, zk.CorporationId)
 }
 
-func (zk *Zkillboard) fetchKillmails() error {
+func (zk *CorporationZkillboard) fetchKillmails() error {
 	zk.Killmails = make([]ZkillboardKillmail, 0)
 	request, err := http.NewRequest(http.MethodGet, zk.requestUrl(), nil)
 	if err != nil {
@@ -126,7 +160,7 @@ func (pk *PairedKillmail) isWorthlessCapsule() bool {
 	return pk.EsiKillmail.Victim.ShipTypeId == Capsule && pk.ZkillboardKillmail.Zkb.TotalValue <= 10001
 }
 
-func (pk *PairedKillmail) getCharacters() (*EsiCharacter, *EsiCharacter, error) {
+func (pk *PairedKillmail) getCharacters() (victim *EsiCharacter, finalBlowCharacter *EsiCharacter, err error) {
 	if pk.ZkillboardKillmail.Zkb.Npc {
 		return nil, nil, errors.New("Npc kill")
 	}
@@ -137,11 +171,11 @@ func (pk *PairedKillmail) getCharacters() (*EsiCharacter, *EsiCharacter, error) 
 		return nil, nil, err
 	}
 
-	victim, err := fetchCharacter(victimCharId)
+	victim, err = fetchCharacter(victimCharId)
 	if err != nil {
 		return nil, nil, err
 	}
-	finalBlowCharacter, err := fetchCharacter(finalBlowCharacterId)
+	finalBlowCharacter, err = fetchCharacter(finalBlowCharacterId)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -178,6 +212,8 @@ func (fk *FeedboardKillmail) Isk() string {
 }
 
 type Esi struct {
+	CorporationId int64
+	Mutext        sync.RWMutex
 	KillmailLimit int
 	Killmails     []FeedboardKillmail
 }
@@ -188,37 +224,22 @@ func newEsi(killmailLimit int) *Esi {
 	}
 }
 
-func (e *Esi) fetchKillmails(zk Zkillboard) error {
+func (e *Esi) fetchKillmails(zk CorporationZkillboard) {
 	killmails := make([]FeedboardKillmail, 0, e.KillmailLimit)
 	for idx := range zk.Killmails {
 		if len(killmails) == e.KillmailLimit {
 			break
 		}
 		zkillboardKillmail := &zk.Killmails[idx]
-		requestUrl := esiKillmailEndpoint(zkillboardKillmail.KillmailId, zkillboardKillmail.Zkb.Hash)
-		request, err := http.NewRequest(http.MethodGet, requestUrl, nil)
-		if err != nil {
-			return nil
-		}
+		esiKillmail, err := fetchKillmail(zkillboardKillmail.KillmailId, zkillboardKillmail.Zkb.Hash)
 
-		response, err := http.DefaultClient.Do(request)
 		if err != nil {
-			return nil
-		}
-
-		responseBodyBytes, err := io.ReadAll(response.Body)
-		if err != nil {
-			return nil
-		}
-
-		var esiKillmail EsiKillmail
-		err = json.Unmarshal(responseBodyBytes, &esiKillmail)
-		if err != nil {
-			return nil
+			log.Println(err)
+			continue
 		}
 
 		pair := PairedKillmail{
-			EsiKillmail:        &esiKillmail,
+			EsiKillmail:        esiKillmail,
 			ZkillboardKillmail: zkillboardKillmail,
 		}
 
@@ -241,8 +262,32 @@ func (e *Esi) fetchKillmails(zk Zkillboard) error {
 	}
 
 	e.Killmails = killmails
+}
 
-	return nil
+func fetchKillmail(killmailid int64, hash string) (*EsiKillmail, error) {
+	requestUrl := esiKillmailEndpoint(killmailid, hash)
+	request, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	responseBodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var esiKillmail EsiKillmail
+	err = json.Unmarshal(responseBodyBytes, &esiKillmail)
+	if err != nil {
+		return nil, err
+	}
+
+	return &esiKillmail, nil
 }
 
 func fetchCharacter(charId int64) (*EsiCharacter, error) {
@@ -272,16 +317,70 @@ func fetchCharacter(charId int64) (*EsiCharacter, error) {
 }
 
 func (e *Esi) fetchFiftyFiftyFiftyFeeds() error {
-	zkillboard := Zkillboard{CorporationId: 98684728}
+	zkillboard := CorporationZkillboard{CorporationId: 98684728}
 	err := zkillboard.fetchKillmails()
 	if err != nil {
 		return err
 	}
 
-	err = e.fetchKillmails(zkillboard)
-	if err != nil {
-		return err
-	}
+	e.CorporationId = zkillboard.CorporationId
+
+	e.fetchKillmails(zkillboard)
 
 	return nil
+}
+
+func (e *Esi) handleWebsocketKillmail(km *ZkillWebsocketSimpleKillmail) {
+	esiKillmail, err := fetchKillmail(km.KillId, *km.Hash)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	zkillboardKillmail := ZkillboardKillmail{KillmailId: esiKillmail.KillmailId}
+	err = zkillboardKillmail.fetchKillmail()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	pair := PairedKillmail{
+		EsiKillmail:        esiKillmail,
+		ZkillboardKillmail: &zkillboardKillmail,
+	}
+
+	if pair.isWorthlessCapsule() {
+		return
+	}
+
+	victim, finalBlow, err := pair.getCharacters()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	killmail := FeedboardKillmail{
+		CorporationId: e.CorporationId,
+		Killmail:      pair,
+		Victim:        *victim,
+		FinalBlow:     *finalBlow,
+	}
+
+	e.appendKillmailToStart(killmail)
+}
+
+func (e *Esi) setKillmails(killmails []FeedboardKillmail) {
+	e.Mutext.Lock()
+
+	e.Killmails = killmails
+
+	e.Mutext.Unlock()
+}
+
+func (e *Esi) appendKillmailToStart(killmail FeedboardKillmail) {
+	e.Mutext.Lock()
+
+	e.Killmails = append([]FeedboardKillmail{killmail}, e.Killmails[:e.KillmailLimit-1]...)
+
+	e.Mutext.Unlock()
 }

@@ -3,6 +3,7 @@ module github.com/HrvojeLesar/website
 go 1.21.3
 
 require (
+	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/go-co-op/gocron v1.36.1 // indirect
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect

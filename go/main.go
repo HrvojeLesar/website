@@ -14,10 +14,14 @@ const (
 )
 
 func main() {
-	esi := newEsi(KILLMAILCOUNT)
-	scheduler := gocron.NewScheduler(time.UTC)
 
-	scheduler.Every(10).Minutes().Do(func() {
+	esi := newEsi(KILLMAILCOUNT)
+
+	zkm := NewZkillWebsocketManager(esi.handleWebsocketKillmail, ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
+	zkm.Run()
+
+	scheduler := gocron.NewScheduler(time.UTC)
+	scheduler.Every(24).Hours().Do(func() {
 		log.Println("Fetching killmails")
 		err := esi.fetchFiftyFiftyFiftyFeeds()
 		if err != nil {
@@ -32,7 +36,6 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	fmt.Println("Listening on http://localhost:3000")
-
 	scheduler.StartAsync()
 	err := http.ListenAndServe(":3000", nil)
 	scheduler.Stop()

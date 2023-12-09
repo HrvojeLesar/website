@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
@@ -53,21 +54,7 @@ func NewZkillWebsocket(filter ZkillWebsocketFilter) *ZkillWebsocket {
 	}
 }
 
-func (zk *ZkillWebsocket) newContext() {
-	dialCtx, dialCancel := context.WithTimeout(context.Background(), time.Minute)
-	readCtx, readCancel := context.WithCancel(context.Background())
-
-	zk.DialContext = Context{Context: dialCtx, CancelFunc: dialCancel}
-	zk.ReadContext = Context{Context: readCtx, CancelFunc: readCancel}
-}
-
 func (zk *ZkillWebsocket) Connect() error {
-	err := zk.Disconnect()
-	if err != nil {
-		return err
-	}
-
-	zk.newContext()
 	connection, _, err := websocket.Dial(zk.DialContext.Context, "wss://zkillboard.com/websocket/", nil)
 	defer zk.DialContext.CancelFunc()
 	if err != nil {
@@ -84,9 +71,6 @@ func (zk *ZkillWebsocket) Connect() error {
 }
 
 func (zk *ZkillWebsocket) Disconnect() error {
-	if zk.connection == nil {
-		return nil
-	}
 	err := zk.connection.Close(websocket.StatusNormalClosure, "")
 	if err != nil {
 		return err
@@ -94,19 +78,18 @@ func (zk *ZkillWebsocket) Disconnect() error {
 	return nil
 }
 
-func (zk *ZkillWebsocket) Read() chan *ZkillKmChannel {
+func (zk *ZkillWebsocket) KillmailChan() chan *ZkillKmChannel {
 	var v ZkillWebsocketSimpleKillmail
 	kmChan := make(chan *ZkillKmChannel)
 	go func() {
 		for {
 			err := wsjson.Read(zk.ReadContext.Context, zk.connection, &v)
 			if err != nil {
-				log.Println("crko")
 				kmChan <- &ZkillKmChannel{
 					ZkillWebsocketSimpleKillmail: nil,
 					Error:                        err,
 				}
-				break
+				return
 			}
 			kmChan <- &ZkillKmChannel{
 				ZkillWebsocketSimpleKillmail: &v,
@@ -125,4 +108,48 @@ func (zk *ZkillWebsocket) Read() chan *ZkillKmChannel {
 	}()
 
 	return kmChan
+}
+
+type ZkillWebsocketManager struct {
+	ZkillWebsocketFilter
+	Backoff  backoff.BackOff
+	Callback func(km *ZkillWebsocketSimpleKillmail)
+}
+
+func NewZkillWebsocketManager(killmailCallback func(km *ZkillWebsocketSimpleKillmail), filter ZkillWebsocketFilter) *ZkillWebsocketManager {
+	return &ZkillWebsocketManager{
+		ZkillWebsocketFilter: filter,
+		Backoff:              backoff.NewExponentialBackOff(),
+		Callback:             killmailCallback,
+	}
+}
+
+func (zk *ZkillWebsocketManager) Run() {
+	go func() {
+		backoff.RetryNotify(zk.connectAndReadWebsocket, zk.Backoff,
+			func(err error, d time.Duration) {
+				log.Println("Zkill websocket error: ", err)
+				log.Println("Trying reconnect in: ", d)
+			})
+	}()
+}
+
+func (zk *ZkillWebsocketManager) connectAndReadWebsocket() (err error) {
+	ws := NewZkillWebsocket(zk.ZkillWebsocketFilter)
+	err = ws.Connect()
+	if err != nil {
+		return err
+	}
+
+	zk.Backoff.Reset()
+
+	killmailChan := ws.KillmailChan()
+	for {
+		killmail := <-killmailChan
+		if killmail.Error != nil {
+			return killmail.Error
+		}
+
+		zk.Callback(killmail.ZkillWebsocketSimpleKillmail)
+	}
 }
