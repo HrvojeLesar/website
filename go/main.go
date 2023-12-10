@@ -15,9 +15,12 @@ const (
 
 func main() {
 
-	esi := newEsi(KILLMAILCOUNT)
+	feedboardWebsockerServer := newFeedboardWebsocketServer()
+	feedboardWebsockerServer.KillmailListener()
 
-	zkm := NewZkillWebsocketManager(esi.handleWebsocketKillmail, ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
+	esi := newEsi(KILLMAILCOUNT, feedboardWebsockerServer.KillmailChan)
+
+    zkm := NewZkillWebsocketManager(esi.handleWebsocketKillmail, ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
 	zkm.Run()
 
 	scheduler := gocron.NewScheduler(time.UTC)
@@ -33,6 +36,7 @@ func main() {
 
 	serveHandler := newServeHandler(esi)
 	http.HandleFunc("/", serveHandler.handle)
+	http.HandleFunc("/feedboard-subscribe", feedboardWebsockerServer.subscribeHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	fmt.Println("Listening on http://localhost:3000")

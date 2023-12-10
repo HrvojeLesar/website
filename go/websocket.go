@@ -89,6 +89,7 @@ func (zk *ZkillWebsocket) KillmailChan() chan *ZkillKmChannel {
 	go func() {
 		for {
 			err := wsjson.Read(zk.ReadContext.Context, zk.connection, &v)
+			log.Println("New killmail recieved")
 			if err != nil {
 				kmChan <- &ZkillKmChannel{
 					ZkillWebsocketSimpleKillmail: nil,

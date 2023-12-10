@@ -9,8 +9,6 @@ import (
 	"log"
 	"net/http"
 	"sync"
-
-	"github.com/nkall/compactnumber"
 )
 
 const (
@@ -22,8 +20,6 @@ const (
 	AcceptEncodingValue    = "gzip"
 	Capsule                = 670
 )
-
-var formatter = compactnumber.NewFormatter("en-UK", compactnumber.Short)
 
 func esiKillmailEndpoint(killmailid int64, hash string) string {
 	return fmt.Sprintf("https://esi.evetech.net/latest/killmails/%d/%s/?datasource=tranquility", killmailid, hash)
@@ -203,24 +199,21 @@ func (fk *FeedboardKillmail) IsKill() bool {
 }
 
 func (fk *FeedboardKillmail) Isk() string {
-	iskValue, err := formatter.Format(int(fk.Killmail.ZkillboardKillmail.Zkb.TotalValue))
-	if err != nil {
-		log.Println(err)
-		return ""
-	}
-	return iskValue
+	return Format(fk.Killmail.ZkillboardKillmail.Zkb.TotalValue)
 }
 
 type Esi struct {
-	CorporationId int64
-	Mutext        sync.RWMutex
-	KillmailLimit int
-	Killmails     []FeedboardKillmail
+	CorporationId       int64
+	Mutext              sync.RWMutex
+	KillmailLimit       int
+	Killmails           []FeedboardKillmail
+	WebsocketServerChan chan<- []FeedboardKillmail
 }
 
-func newEsi(killmailLimit int) *Esi {
+func newEsi(killmailLimit int, websocketServerChan chan<- []FeedboardKillmail) *Esi {
 	return &Esi{
-		KillmailLimit: killmailLimit,
+		KillmailLimit:       killmailLimit,
+		WebsocketServerChan: websocketServerChan,
 	}
 }
 
@@ -367,6 +360,7 @@ func (e *Esi) handleWebsocketKillmail(km *ZkillWebsocketSimpleKillmail) {
 	}
 
 	e.appendKillmailToStart(killmail)
+	e.sendKillmailsToWebsocket()
 }
 
 func (e *Esi) setKillmails(killmails []FeedboardKillmail) {
@@ -383,4 +377,10 @@ func (e *Esi) appendKillmailToStart(killmail FeedboardKillmail) {
 	e.Killmails = append([]FeedboardKillmail{killmail}, e.Killmails[:e.KillmailLimit-1]...)
 
 	e.Mutext.Unlock()
+}
+
+func (e *Esi) sendKillmailsToWebsocket() {
+	e.Mutext.RLock()
+	e.WebsocketServerChan <- e.Killmails
+	e.Mutext.RUnlock()
 }
