@@ -1,0 +1,17 @@
+{{ $feedboard := . }}
+{{ if $feedboard }}
+<div class="feedboard">
+    <div class="feedboard-title">
+        <a href="https://zkillboard.com/corporation/98684728/">
+            Fifty Fifty Fifty Feedboard
+        </a>
+    </div>
+    <div class="feedboard-description">Displaying last {{ len $feedboard }} kills</div>
+    <div class="feedboard-kills-container">
+        {{ range $fIndex, $feed := $feedboard }}
+        {{ template "feedboard_item.html" $feed }}
+        {{ end}}
+    </div>
+    <div class="feedboard-background-image"></div>
+</div>
+{{ end}}

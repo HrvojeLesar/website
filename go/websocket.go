@@ -1,9 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"html/template"
 	"log"
+	"net"
+	"net/http"
+	"sync"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -151,5 +156,142 @@ func (zk *ZkillWebsocketManager) connectAndReadWebsocket() (err error) {
 		}
 
 		zk.Callback(killmail.ZkillWebsocketSimpleKillmail)
+	}
+}
+
+type feedboardSubscriber struct {
+	msgs      chan []byte
+	closeSlow func()
+}
+
+type FeedboardWebsocketServer struct {
+	KillmailChan            chan []FeedboardKillmail
+	subscriberMessageBuffer int
+	subscribersMu           sync.Mutex
+	subscribers             map[*feedboardSubscriber]struct{}
+}
+
+func newFeedboardWebsocketServer() *FeedboardWebsocketServer {
+	return &FeedboardWebsocketServer{
+		KillmailChan:            make(chan []FeedboardKillmail),
+		subscriberMessageBuffer: 16,
+		subscribers:             make(map[*feedboardSubscriber]struct{}),
+	}
+}
+
+func (fws *FeedboardWebsocketServer) subscribeHandler(w http.ResponseWriter, r *http.Request) {
+	err := fws.subscribe(r.Context(), w, r)
+	if errors.Is(err, context.Canceled) {
+		return
+	}
+	if websocket.CloseStatus(err) == websocket.StatusNormalClosure ||
+		websocket.CloseStatus(err) == websocket.StatusGoingAway {
+		return
+	}
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
+
+func (fws *FeedboardWebsocketServer) subscribe(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	var mu sync.Mutex
+	var c *websocket.Conn
+	var closed bool
+	s := &feedboardSubscriber{
+		msgs: make(chan []byte, fws.subscriberMessageBuffer),
+		closeSlow: func() {
+			mu.Lock()
+			defer mu.Unlock()
+			closed = true
+			if c != nil {
+				c.Close(websocket.StatusPolicyViolation, "Connection too slow to kueep up with messages")
+			}
+		},
+	}
+
+	fws.addSubscriber(s)
+	defer fws.deleteSubscriber(s)
+
+	c2, err := websocket.Accept(w, r, nil)
+	if err != nil {
+		return err
+	}
+	mu.Lock()
+	if closed {
+		mu.Unlock()
+		return net.ErrClosed
+	}
+	c = c2
+	mu.Unlock()
+	defer c.CloseNow()
+
+	ctx = c.CloseRead(ctx)
+
+	for {
+		select {
+		case msg := <-s.msgs:
+			err := writeTimeout(ctx, 5*time.Second, c, msg)
+			if err != nil {
+				return err
+			}
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+}
+
+func (fws *FeedboardWebsocketServer) addSubscriber(s *feedboardSubscriber) {
+	log.Println("New sub")
+	fws.subscribersMu.Lock()
+	fws.subscribers[s] = struct{}{}
+	fws.subscribersMu.Unlock()
+}
+
+func (fws *FeedboardWebsocketServer) deleteSubscriber(s *feedboardSubscriber) {
+	fws.subscribersMu.Lock()
+	delete(fws.subscribers, s)
+	fws.subscribersMu.Unlock()
+}
+
+func writeTimeout(ctx context.Context, timeout time.Duration, c *websocket.Conn, msg []byte) error {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	return c.Write(ctx, websocket.MessageText, msg)
+}
+
+func (fws *FeedboardWebsocketServer) KillmailListener() {
+	go func() {
+		var templateBuffer bytes.Buffer
+		for {
+			log.Println(len(fws.subscribers))
+			templateBuffer.Reset()
+			killmails := <-fws.KillmailChan
+			if len(killmails) < 1 {
+				continue
+			}
+			templ := template.Must(template.ParseFiles("templates/feedboard_item.html"))
+			err := templ.Execute(&templateBuffer, &killmails[0])
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fws.sendTemplate(templateBuffer.Bytes())
+		}
+	}()
+}
+
+func (fws *FeedboardWebsocketServer) sendTemplate(template []byte) {
+	fws.subscribersMu.Lock()
+	defer fws.subscribersMu.Unlock()
+
+	for s := range fws.subscribers {
+		select {
+		case s.msgs <- template:
+		default:
+			go s.closeSlow()
+		}
 	}
 }
