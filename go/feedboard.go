@@ -9,6 +9,9 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
+
+	"github.com/hashicorp/golang-lru/v2/expirable"
 )
 
 const (
@@ -20,6 +23,8 @@ const (
 	AcceptEncodingValue    = "gzip"
 	Capsule                = 670
 )
+
+var cache = expirable.NewLRU[int64, EsiCharacter](50, nil, time.Hour*24*30)
 
 func esiKillmailEndpoint(killmailid int64, hash string) string {
 	return fmt.Sprintf("https://esi.evetech.net/latest/killmails/%d/%s/?datasource=tranquility", killmailid, hash)
@@ -208,6 +213,7 @@ type Esi struct {
 	KillmailLimit       int
 	Killmails           []FeedboardKillmail
 	WebsocketServerChan chan<- []FeedboardKillmail
+	CharacterCache      *expirable.LRU[int64, EsiCharacter]
 }
 
 func newEsi(killmailLimit int, websocketServerChan chan<- []FeedboardKillmail) *Esi {
@@ -284,6 +290,11 @@ func fetchKillmail(killmailid int64, hash string) (*EsiKillmail, error) {
 }
 
 func fetchCharacter(charId int64) (*EsiCharacter, error) {
+	cachedChar, ok := cache.Get(charId)
+	if ok {
+		return &cachedChar, nil
+	}
+
 	character := EsiCharacter{Id: charId}
 	requestUrl := esiCharacterEndpoint(charId)
 
@@ -306,6 +317,7 @@ func fetchCharacter(charId int64) (*EsiCharacter, error) {
 		return nil, err
 	}
 
+	cache.Add(charId, character)
 	return &character, nil
 }
 

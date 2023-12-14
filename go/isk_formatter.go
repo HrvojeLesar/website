@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math"
 )
 
@@ -24,8 +23,6 @@ func Format(value float64) string {
 		count += 1
 		tmpValue /= 1000
 	}
-
-	log.Println(count)
 
 	return fmt.Sprintf("%.2f%s", value/math.Pow(1000, float64(count)), suffix[count])
 }

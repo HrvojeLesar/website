@@ -6,7 +6,7 @@
             Fifty Fifty Fifty Feedboard
         </a>
     </div>
-    <div class="feedboard-description">Displaying last {{ len $feedboard }} kills</div>
+    <div class="feedboard-description">Displaying latest {{ len $feedboard }} kills</div>
     <div class="feedboard-kills-container">
         {{ range $fIndex, $feed := $feedboard }}
         {{ template "feedboard_item.html" $feed }}

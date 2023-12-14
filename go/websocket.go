@@ -267,7 +267,7 @@ func (fws *FeedboardWebsocketServer) KillmailListener() {
 	go func() {
 		var templateBuffer bytes.Buffer
 		for {
-			log.Println(len(fws.subscribers))
+            log.Println("WS sub number: ", len(fws.subscribers))
 			templateBuffer.Reset()
 			killmails := <-fws.KillmailChan
 			if len(killmails) < 1 {
