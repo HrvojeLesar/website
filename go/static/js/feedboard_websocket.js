@@ -1,5 +1,5 @@
 function startConnection() {
-    const conn = new WebSocket(`ws://${location.host}/feedboard-subscribe`);
+    const conn = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/feedboard-subscribe`);
 
     conn.addEventListener("open", () => {
         console.log("Connected to feedboard websocket");

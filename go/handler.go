@@ -70,7 +70,7 @@ func (sh *ServeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 func (sh *ServeHandler) PeriodicDocRerender() {
 	log.Println("Periodic Rerender")
 	sh.executedTemplate.Reset()
-	err := sh.executeTemplate(&sh.executedTemplate, nil)
+	err := sh.executeTemplate(&sh.executedTemplate, sh.Esi.Killmails)
 	if err != nil {
 		log.Println(err)
 	}

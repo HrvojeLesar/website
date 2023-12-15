@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -12,6 +13,16 @@ import (
 const (
 	KILLMAILCOUNT int = 10
 )
+
+func port() string {
+	port, isSet := os.LookupEnv("GO_PORT")
+	if isSet {
+		return fmt.Sprintf(":%s", port)
+	} else {
+		return ":3000"
+	}
+
+}
 
 func main() {
 
@@ -43,9 +54,9 @@ func main() {
 	http.HandleFunc("/feedboard-subscribe", feedboardWebsockerServer.SubscribeHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
-	fmt.Println("Listening on http://localhost:3000")
+	fmt.Printf("Listening on http://localhost%s\n", port())
 	scheduler.StartAsync()
-	err := http.ListenAndServe(":3000", nil)
+	err := http.ListenAndServe(port(), nil)
 	scheduler.Stop()
 	if err != nil {
 		log.Panic(err)
