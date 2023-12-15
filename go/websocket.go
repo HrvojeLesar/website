@@ -146,6 +146,7 @@ func (zk *ZkillWebsocketManager) connectAndReadWebsocket() (err error) {
 	if err != nil {
 		return err
 	}
+	log.Println("Connected to Zkillboard Websocket")
 
 	zk.Backoff.Reset()
 
@@ -207,7 +208,7 @@ func (fws *FeedboardWebsocketServer) subscribe(ctx context.Context, w http.Respo
 			defer mu.Unlock()
 			closed = true
 			if c != nil {
-				c.Close(websocket.StatusPolicyViolation, "Connection too slow to kueep up with messages")
+				c.Close(websocket.StatusPolicyViolation, "Connection too slow to keep up with messages")
 			}
 		},
 	}
@@ -244,13 +245,14 @@ func (fws *FeedboardWebsocketServer) subscribe(ctx context.Context, w http.Respo
 }
 
 func (fws *FeedboardWebsocketServer) addSubscriber(s *feedboardSubscriber) {
-	log.Println("New sub")
+	log.Println("New websocket subscriber")
 	fws.subscribersMu.Lock()
 	fws.subscribers[s] = struct{}{}
 	fws.subscribersMu.Unlock()
 }
 
 func (fws *FeedboardWebsocketServer) deleteSubscriber(s *feedboardSubscriber) {
+	log.Println("Websocket unsubscribe")
 	fws.subscribersMu.Lock()
 	delete(fws.subscribers, s)
 	fws.subscribersMu.Unlock()
@@ -267,7 +269,6 @@ func (fws *FeedboardWebsocketServer) KillmailListener() {
 	go func() {
 		var templateBuffer bytes.Buffer
 		for {
-            log.Println("WS sub number: ", len(fws.subscribers))
 			templateBuffer.Reset()
 			killmails := <-fws.KillmailChan
 			if len(killmails) < 1 {

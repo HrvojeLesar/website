@@ -213,11 +213,13 @@ type Esi struct {
 	KillmailLimit       int
 	Killmails           []FeedboardKillmail
 	WebsocketServerChan chan<- []FeedboardKillmail
+	TemplateCacheChan   chan []FeedboardKillmail
 	CharacterCache      *expirable.LRU[int64, EsiCharacter]
 }
 
 func newEsi(killmailLimit int, websocketServerChan chan<- []FeedboardKillmail) *Esi {
 	return &Esi{
+		TemplateCacheChan:   make(chan []FeedboardKillmail),
 		KillmailLimit:       killmailLimit,
 		WebsocketServerChan: websocketServerChan,
 	}
@@ -261,6 +263,9 @@ func (e *Esi) fetchKillmails(zk CorporationZkillboard) {
 	}
 
 	e.Killmails = killmails
+	e.Mutext.Lock()
+	e.TemplateCacheChan <- e.Killmails
+	e.Mutext.Unlock()
 }
 
 func fetchKillmail(killmailid int64, hash string) (*EsiKillmail, error) {
@@ -394,5 +399,6 @@ func (e *Esi) appendKillmailToStart(killmail FeedboardKillmail) {
 func (e *Esi) sendKillmailsToWebsocket() {
 	e.Mutext.RLock()
 	e.WebsocketServerChan <- e.Killmails
+	e.TemplateCacheChan <- e.Killmails
 	e.Mutext.RUnlock()
 }

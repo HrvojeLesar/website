@@ -15,12 +15,14 @@ const (
 
 func main() {
 
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	feedboardWebsockerServer := newFeedboardWebsocketServer()
 	feedboardWebsockerServer.KillmailListener()
 
 	esi := newEsi(KILLMAILCOUNT, feedboardWebsockerServer.KillmailChan)
 
-    zkm := NewZkillWebsocketManager(esi.handleWebsocketKillmail, ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
+	zkm := NewZkillWebsocketManager(esi.handleWebsocketKillmail, ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
 	zkm.Run()
 
 	scheduler := gocron.NewScheduler(time.UTC)
@@ -34,8 +36,8 @@ func main() {
 		}
 	})
 
-	serveHandler := newServeHandler(esi)
-	http.HandleFunc("/", serveHandler.handle)
+	serveHandler := NewServeHandler(esi)
+	http.HandleFunc("/", serveHandler.Handle)
 	http.HandleFunc("/feedboard-subscribe", feedboardWebsockerServer.subscribeHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
