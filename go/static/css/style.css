@@ -11,6 +11,8 @@
     --bg-red-900: rgb(201 42 42);
     --bg-green-900: rgb(43 138 62);
     --text-white: rgb(255 255 255);
+
+    --navbar-item-hover-background: rgb(44 46 51);
     color-scheme: dark;
 }
 
@@ -23,6 +25,7 @@ html.light {
     --text-dark-200: rgb(52 52 52);
     --text-dark-300: rgb(88 88 88);
     --fill-gray-500: #5b5b5b;
+
     color-scheme: light;
 }
 
@@ -96,8 +99,9 @@ a.subsection-image:hover {
 }
 
 .navbar-item:hover {
-    background-color: var(--bg-dark-500);
+    background-color: var(--navbar-item-hover-background);
     text-decoration: none;
+    cursor: pointer;
 }
 
 .navbar-item-icon {

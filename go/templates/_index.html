@@ -9,6 +9,7 @@
         integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
     <link href="../static/css/style.css" rel="stylesheet">
     <script defer src="../static/js/feedboard_websocket.js"></script>
+    <script defer src="../static/js/theme_switch.js"></script>
 </head>
 
 <body>
@@ -20,7 +21,7 @@
             {{ end }}
         </div>
         <div class="navbar-items">
-            <a class="navbar-item" href="mailto://hrvoje.lesar1@hotmail.com">
+            <a class="navbar-item" href="mailto://hrvoje.lesar1@hotmail.com" title="E-mail">
                 <svg class="navbar-item-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="26"
                     viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.-->
                     <path
@@ -28,7 +29,7 @@
                 </svg>
                 E-Mail
             </a>
-            <a class="navbar-item" href="https://github.com/HrvojeLesar">
+            <a class="navbar-item" href="https://github.com/HrvojeLesar" title="Github">
                 <svg class="navbar-item-icon" xmlns="http://www.w3.org/2000/svg" height="28" width="26"
                     viewBox="0 0 496 512"><!--!Font Awesome Free 6.5.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.-->
                     <path
@@ -36,7 +37,7 @@
                 </svg>
                 Github
             </a>
-            <a class="navbar-item" href="https://twitter.com/HrvojeLesar">
+            <a class="navbar-item" href="https://twitter.com/HrvojeLesar" title="Twitter">
                 <svg class="navbar-item-icon" xmlns="http://www.w3.org/2000/svg" height="28" width="26"
                     viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.-->
                     <path
@@ -44,6 +45,12 @@
                 </svg>
                 X
             </a>
+            <div class="navbar-item theme-switch" title="Toggle light/dark mode">
+                <svg class="navbar-item-icon" viewBox="0 0 24 24" height="28" width="26" stroke-linecap="round"
+                    stroke-linejoin="round" stroke-width="2" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                </svg>
+            </div>
         </div>
     </div>
     {{ range $index, $section := $sections }}
@@ -140,21 +147,6 @@
             </div>
         </div>
     </footer>
-
-    <button>SWITCH</button>
-    <script>
-        const btn = document.querySelector("button");
-        let isDark = true;
-
-        btn.addEventListener("click", () => {
-            document.documentElement.setAttribute(
-                "class",
-                isDark ? "light" : "dark"
-            );
-
-            isDark = !isDark;
-        });
-    </script>
 </body>
 
 </html>
