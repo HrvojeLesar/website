@@ -181,7 +181,7 @@ func newFeedboardWebsocketServer() *FeedboardWebsocketServer {
 	}
 }
 
-func (fws *FeedboardWebsocketServer) subscribeHandler(w http.ResponseWriter, r *http.Request) {
+func (fws *FeedboardWebsocketServer) SubscribeHandler(w http.ResponseWriter, r *http.Request) {
 	err := fws.subscribe(r.Context(), w, r)
 	if errors.Is(err, context.Canceled) {
 		return

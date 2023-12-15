@@ -45,7 +45,10 @@ func (sh *ServeHandler) listenForKillmailUpdates() {
 
 func (sh *ServeHandler) makeTemplate() {
 	sh.mainTemplate = template.Must(template.ParseFiles("templates/_index.html", "templates/feedboard.html", "templates/feedboard_item.html"))
-	sh.executeTemplate(&sh.executedTemplate, nil)
+	err := sh.executeTemplate(&sh.executedTemplate, nil)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (sh *ServeHandler) executeTemplate(w io.Writer, killmails []FeedboardKillmail) error {
@@ -61,5 +64,14 @@ func (sh *ServeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write(sh.executedTemplate.Bytes())
 	if err != nil {
 		panic(err)
+	}
+}
+
+func (sh *ServeHandler) PeriodicDocRerender() {
+	log.Println("Periodic Rerender")
+	sh.executedTemplate.Reset()
+	err := sh.executeTemplate(&sh.executedTemplate, nil)
+	if err != nil {
+		log.Println(err)
 	}
 }

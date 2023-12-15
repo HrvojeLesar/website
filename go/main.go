@@ -24,6 +24,7 @@ func main() {
 
 	zkm := NewZkillWebsocketManager(esi.handleWebsocketKillmail, ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
 	zkm.Run()
+	serveHandler := NewServeHandler(esi)
 
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.Every(24).Hours().Do(func() {
@@ -36,9 +37,10 @@ func main() {
 		}
 	})
 
-	serveHandler := NewServeHandler(esi)
+	scheduler.Every(5).Minutes().Do(serveHandler.PeriodicDocRerender)
+
 	http.HandleFunc("/", serveHandler.Handle)
-	http.HandleFunc("/feedboard-subscribe", feedboardWebsockerServer.subscribeHandler)
+	http.HandleFunc("/feedboard-subscribe", feedboardWebsockerServer.SubscribeHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	fmt.Println("Listening on http://localhost:3000")
