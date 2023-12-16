@@ -219,7 +219,7 @@ type Esi struct {
 
 func newEsi(killmailLimit int, websocketServerChan chan<- []FeedboardKillmail) *Esi {
 	return &Esi{
-		TemplateCacheChan:   make(chan []FeedboardKillmail),
+		TemplateCacheChan:   make(chan []FeedboardKillmail, 10),
 		KillmailLimit:       killmailLimit,
 		WebsocketServerChan: websocketServerChan,
 	}

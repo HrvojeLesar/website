@@ -31,14 +31,15 @@ func (sh *ServeHandler) listenForKillmailUpdates() {
 		for {
 			killmails := <-sh.Esi.TemplateCacheChan
 			sh.mutex.Lock()
-			defer sh.mutex.Unlock()
 
 			sh.executedTemplate.Reset()
 			err := sh.executeTemplate(&sh.executedTemplate, killmails)
 			if err != nil {
 				log.Println(err)
+				sh.mutex.Unlock()
 				continue
 			}
+			sh.mutex.Unlock()
 		}
 	}()
 }
