@@ -84,10 +84,10 @@ func (zk *ZkillWebsocket) Disconnect() error {
 }
 
 func (zk *ZkillWebsocket) KillmailChan() chan *ZkillKmChannel {
-	var v ZkillWebsocketSimpleKillmail
-	kmChan := make(chan *ZkillKmChannel)
+	kmChan := make(chan *ZkillKmChannel, 10)
 	go func() {
 		for {
+			var v ZkillWebsocketSimpleKillmail
 			err := wsjson.Read(zk.ReadContext.Context, zk.connection, &v)
 			log.Println("New killmail recieved")
 			if err != nil {
@@ -132,11 +132,16 @@ func NewZkillWebsocketManager(killmailCallback func(km *ZkillWebsocketSimpleKill
 
 func (zk *ZkillWebsocketManager) Run() {
 	go func() {
-		backoff.RetryNotify(zk.connectAndReadWebsocket, zk.Backoff,
-			func(err error, d time.Duration) {
-				log.Println("Zkill websocket error: ", err)
-				log.Println("Trying reconnect in: ", d)
-			})
+		for {
+			err := backoff.RetryNotify(zk.connectAndReadWebsocket, zk.Backoff,
+				func(err error, d time.Duration) {
+					log.Println("Zkill websocket error: ", err)
+					log.Println("Trying reconnect in: ", d)
+				})
+			if err != nil {
+				log.Println(err)
+			}
+		}
 	}()
 }
 
