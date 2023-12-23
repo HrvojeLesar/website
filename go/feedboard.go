@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sort"
 	"sync"
 	"time"
 
@@ -83,7 +84,9 @@ func (zk *ZkillboardKillmail) fetchKillmail() error {
 		return err
 	}
 
-	zk.Zkb = killmails[0].Zkb
+	if len(killmails) > 0 {
+		zk.Zkb = killmails[0].Zkb
+	}
 	return nil
 }
 
@@ -391,7 +394,11 @@ func (e *Esi) setKillmails(killmails []FeedboardKillmail) {
 func (e *Esi) appendKillmailToStart(killmail FeedboardKillmail) {
 	e.Mutext.Lock()
 
-	e.Killmails = append([]FeedboardKillmail{killmail}, e.Killmails[:e.KillmailLimit-1]...)
+	e.Killmails = append(e.Killmails, killmail)
+	sort.SliceStable(e.Killmails, func(i, j int) bool {
+		return e.Killmails[i].KillmailId() > e.Killmails[j].KillmailId()
+	})
+	e.Killmails = e.Killmails[:e.KillmailLimit-1]
 
 	e.Mutext.Unlock()
 }

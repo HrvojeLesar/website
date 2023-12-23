@@ -157,7 +157,9 @@ func (zk *ZkillWebsocketManager) connectAndReadWebsocket() (err error) {
 
 	killmailChan := ws.KillmailChan()
 	for {
+		log.Println("Waiting for killmail")
 		killmail := <-killmailChan
+		log.Println("Got one")
 		if killmail.Error != nil {
 			return killmail.Error
 		}
@@ -278,14 +280,15 @@ func (fws *FeedboardWebsocketServer) KillmailListener() {
 			killmails := <-fws.KillmailChan
 			if len(killmails) < 1 {
 				continue
+			} else {
+				templ := template.Must(template.ParseFiles("templates/feedboard_item.html"))
+				err := templ.Execute(&templateBuffer, &killmails[0])
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				fws.sendTemplate(templateBuffer.Bytes())
 			}
-			templ := template.Must(template.ParseFiles("templates/feedboard_item.html"))
-			err := templ.Execute(&templateBuffer, &killmails[0])
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			fws.sendTemplate(templateBuffer.Bytes())
 		}
 	}()
 }
