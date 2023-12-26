@@ -398,7 +398,7 @@ func (e *Esi) appendKillmailToStart(killmail FeedboardKillmail) {
 	sort.SliceStable(e.Killmails, func(i, j int) bool {
 		return e.Killmails[i].KillmailId() > e.Killmails[j].KillmailId()
 	})
-	e.Killmails = e.Killmails[:e.KillmailLimit-1]
+	e.Killmails = e.Killmails[:e.KillmailLimit]
 
 	e.Mutext.Unlock()
 }
