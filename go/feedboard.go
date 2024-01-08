@@ -65,6 +65,15 @@ func (zk *ZkillboardKillmail) fetchKillmail() error {
 		return err
 	}
 
+	for response.StatusCode == http.StatusTooManyRequests {
+        log.Println("Too many requests\n Retrying in 5 seconds")
+		time.Sleep(5 * time.Second)
+		response, err = http.DefaultClient.Do(request)
+		if err != nil {
+			return err
+		}
+	}
+
 	gzipReader, err := gzip.NewReader(response.Body)
 	if err != nil {
 		return err
@@ -212,15 +221,15 @@ func (fk *FeedboardKillmail) Isk() string {
 
 type Esi struct {
 	CorporationId       int64
-	Mutext              sync.RWMutex
+	Mutext              sync.Mutex
 	KillmailLimit       int
 	Killmails           []FeedboardKillmail
-	WebsocketServerChan chan<- []FeedboardKillmail
+	WebsocketServerChan chan<- FeedboardKillmail
 	TemplateCacheChan   chan []FeedboardKillmail
 	CharacterCache      *expirable.LRU[int64, EsiCharacter]
 }
 
-func newEsi(killmailLimit int, websocketServerChan chan<- []FeedboardKillmail) *Esi {
+func NewEsi(killmailLimit int, websocketServerChan chan<- FeedboardKillmail) *Esi {
 	return &Esi{
 		TemplateCacheChan:   make(chan []FeedboardKillmail, 10),
 		KillmailLimit:       killmailLimit,
@@ -265,8 +274,8 @@ func (e *Esi) fetchKillmails(zk CorporationZkillboard) {
 		})
 	}
 
-	e.Killmails = killmails
 	e.Mutext.Lock()
+	e.Killmails = killmails
 	e.TemplateCacheChan <- e.Killmails
 	e.Mutext.Unlock()
 }
@@ -379,8 +388,12 @@ func (e *Esi) handleWebsocketKillmail(km *ZkillWebsocketSimpleKillmail) {
 		FinalBlow:     *finalBlow,
 	}
 
+	e.Mutext.Lock()
+	log.Println("New killmail", killmail.KillmailId())
 	e.appendKillmailToStart(killmail)
-	e.sendKillmailsToWebsocket()
+	e.sendKillmailToWebsocket(killmail)
+	e.sendKillmailsToStaticTemplate()
+	e.Mutext.Unlock()
 }
 
 func (e *Esi) setKillmails(killmails []FeedboardKillmail) {
@@ -392,20 +405,17 @@ func (e *Esi) setKillmails(killmails []FeedboardKillmail) {
 }
 
 func (e *Esi) appendKillmailToStart(killmail FeedboardKillmail) {
-	e.Mutext.Lock()
-
 	e.Killmails = append(e.Killmails, killmail)
 	sort.SliceStable(e.Killmails, func(i, j int) bool {
 		return e.Killmails[i].KillmailId() > e.Killmails[j].KillmailId()
 	})
 	e.Killmails = e.Killmails[:e.KillmailLimit]
-
-	e.Mutext.Unlock()
 }
 
-func (e *Esi) sendKillmailsToWebsocket() {
-	e.Mutext.RLock()
-	e.WebsocketServerChan <- e.Killmails
+func (e *Esi) sendKillmailToWebsocket(killmail FeedboardKillmail) {
+	e.WebsocketServerChan <- killmail
+}
+
+func (e *Esi) sendKillmailsToStaticTemplate() {
 	e.TemplateCacheChan <- e.Killmails
-	e.Mutext.RUnlock()
 }

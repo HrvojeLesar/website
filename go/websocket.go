@@ -160,6 +160,7 @@ func (zk *ZkillWebsocketManager) connectAndReadWebsocket() (err error) {
 		log.Println("Waiting for killmail")
 		killmail := <-killmailChan
 		log.Println("Got one")
+		log.Println("Got", killmail.ZkillWebsocketSimpleKillmail.KillId)
 		if killmail.Error != nil {
 			return killmail.Error
 		}
@@ -174,15 +175,16 @@ type feedboardSubscriber struct {
 }
 
 type FeedboardWebsocketServer struct {
-	KillmailChan            chan []FeedboardKillmail
+	KillmailChan            chan FeedboardKillmail
 	subscriberMessageBuffer int
 	subscribersMu           sync.Mutex
 	subscribers             map[*feedboardSubscriber]struct{}
+	templateBuilderMux      sync.Mutex
 }
 
 func newFeedboardWebsocketServer() *FeedboardWebsocketServer {
 	return &FeedboardWebsocketServer{
-		KillmailChan:            make(chan []FeedboardKillmail),
+		KillmailChan:            make(chan FeedboardKillmail),
 		subscriberMessageBuffer: 16,
 		subscribers:             make(map[*feedboardSubscriber]struct{}),
 	}
@@ -276,19 +278,18 @@ func (fws *FeedboardWebsocketServer) KillmailListener() {
 	go func() {
 		var templateBuffer bytes.Buffer
 		for {
-			templateBuffer.Reset()
-			killmails := <-fws.KillmailChan
-			if len(killmails) < 1 {
+			killmail := <-fws.KillmailChan
+			fws.templateBuilderMux.Lock()
+			log.Println("Received killmail id", killmail.KillmailId())
+			templ := template.Must(template.ParseFiles("templates/feedboard_item.html"))
+			err := templ.Execute(&templateBuffer, &killmail)
+			if err != nil {
+				log.Println(err)
 				continue
-			} else {
-				templ := template.Must(template.ParseFiles("templates/feedboard_item.html"))
-				err := templ.Execute(&templateBuffer, &killmails[0])
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-				fws.sendTemplate(templateBuffer.Bytes())
 			}
+			fws.sendTemplate(templateBuffer.Bytes())
+			templateBuffer.Reset()
+			fws.templateBuilderMux.Unlock()
 		}
 	}()
 }
