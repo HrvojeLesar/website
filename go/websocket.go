@@ -160,9 +160,10 @@ func (zk *ZkillWebsocketManager) connectAndReadWebsocket() (err error) {
 		log.Println("Waiting for killmail")
 		killmail := <-killmailChan
 		log.Println("Got one")
-		log.Println("Got", killmail.ZkillWebsocketSimpleKillmail.KillId)
 		if killmail.Error != nil {
 			return killmail.Error
+		} else {
+			log.Println("Got", killmail.ZkillWebsocketSimpleKillmail.KillId)
 		}
 
 		zk.Callback(killmail.ZkillWebsocketSimpleKillmail)

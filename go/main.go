@@ -31,7 +31,7 @@ func main() {
 	feedboardWebsockerServer := newFeedboardWebsocketServer()
 	feedboardWebsockerServer.KillmailListener()
 
-	esi := newEsi(KILLMAILCOUNT, feedboardWebsockerServer.KillmailChan)
+	esi := NewEsi(KILLMAILCOUNT, feedboardWebsockerServer.KillmailChan)
 
 	zkm := NewZkillWebsocketManager(esi.handleWebsocketKillmail, ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
 	zkm.Run()
