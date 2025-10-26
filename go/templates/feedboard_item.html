@@ -1,0 +1,21 @@
+{{ $feed := . }}
+<div class="feedboard-kills-item">
+    <div class="feedboard-character">
+        <a href="https://zkillboard.com/character/{{ $feed.FinalBlow.Id }}/" target="_blank">
+            {{ $feed.FinalBlow.Name }}
+        </a>
+    </div>
+    <div class="feedboard-kills-item-image-container {{ if $feed.IsKill }} feedboard-kill-green-bg {{ end }}">
+        <a class="feedboard-kills-item-image" href="https://zkillboard.com/kill/{{ $feed.KillmailId }}" target="_blank">
+            <img src="https://images.evetech.net/types/{{ $feed.ShipTypeId }}/render?size=128" alt="Image of a ship">
+        </a>
+        <div class="feedboard-isk">
+            {{ $feed.Isk }} ISK
+        </div>
+    </div>
+    <div class="feedboard-character">
+        <a href="https://zkillboard.com/character/{{ $feed.Victim.Id }}/" target="_blank">
+            {{ $feed.Victim.Name }}
+        </a>
+    </div>
+</div>

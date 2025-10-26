@@ -1,0 +1,28 @@
+{
+    "title": {
+        "title": "Kekov soundboard v2 - Beta",
+        "url": "https://bot.hrveklesarov.com/"
+    },
+    "short_text": "Website for controlling a Discord bot that plays uploaded sounds.",
+    "main_text": "Website used to control a Discord bot made for playing short sounds. Original version supported only one server, therefore v2 adds support for multiple servers and an open API for making your own frontend.",
+    "note_text": "Not all features are done or available. Sound file upload limited to certain users, public sounds are available.",
+    "image": {
+        "src": "pepegaphone.svg",
+        "alt": "Pepegaphone",
+        "url": "https://bot.hrveklesarov.com/"
+    },
+    "links": [
+        {
+            "title": "Website",
+            "text": "Website",
+            "url": "https://bot.hrveklesarov.com/",
+            "icon": "globe"
+        },
+        {
+            "title": "Github repository",
+            "text": "Source code",
+            "url": "https://github.com/HrvojeLesar/kekov_soundboard_v2",
+            "icon": "github"
+        }
+    ]
+}

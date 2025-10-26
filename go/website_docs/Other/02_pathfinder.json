@@ -1,0 +1,27 @@
+{
+    "title": {
+        "title": "Pathfinder",
+        "url": "https://pathfinder.hrveklesarov.com/"
+    },
+    "short_text": "Pathfinder is a mapping tool for Eve Online.",
+    "main_text": "Official Pathfinder website was down and most others require characters to be a part of their alliance or corporation, so we decided to host our own instance. As is tradition this requires you to be a part of Fifty Fifty Fifty corporation to have access.",
+    "image": {
+        "src": "pathfinder.png",
+        "alt": "Pathfinder",
+        "url": "https://pathfinder.hrveklesarov.com/"
+    },
+    "links": [
+        {
+            "title": "Website",
+            "text": "Website",
+            "url": "https://pathfinder.hrveklesarov.com/",
+            "icon": "globe"
+        },
+        {
+            "title": "Source code",
+            "text": "Source code",
+            "url": "https://github.com/exodus4d/pathfinder",
+            "icon": "github"
+        }
+    ]
+}

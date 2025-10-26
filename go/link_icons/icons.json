@@ -1,0 +1,30 @@
+[
+    {
+        "name": "envelope-regular",
+        "file": "envelope-regular.svg"
+    },
+    {
+        "name": "envelope-solid",
+        "file": "envelope-solid.svg"
+    },
+    {
+        "name": "twitter",
+        "file": "twitter.svg"
+    },
+    {
+        "name": "github",
+        "file": "github.svg"
+    },
+    {
+        "name": "x-twitter",
+        "file": "x-twitter.svg"
+    },
+    {
+        "name": "globe",
+        "file": "earth-europe-solid.svg"
+    },
+    {
+        "name": "book",
+        "file": "book-solid.svg"
+    }
+]

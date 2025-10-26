@@ -1,0 +1,403 @@
+:root {
+    --bg-dark-400: rgb(55 58 64);
+    --bg-dark-500: rgb(44 46 51);
+    --bg-dark-700: rgb(26 27 30);
+    --text-dark-50: rgb(193 194 197);
+    --text-dark-100: rgb(166 167 171);
+    --text-dark-200: rgb(144 146 150);
+    --text-dark-300: rgb(92 95 102);
+    --fill-gray-500: #adb5bd;
+
+    --bg-red-900: rgb(201 42 42);
+    --bg-green-900: rgb(43 138 62);
+    --text-white: rgb(255 255 255);
+
+    --navbar-item-hover-background: rgb(44 46 51);
+    color-scheme: dark;
+}
+
+html.light {
+    --bg-dark-400: rgb(255 255 255);
+    --bg-dark-500: rgb(231 231 231);
+    --bg-dark-700: rgb(200 200 200);
+    --text-dark-50: rgb(0 0 0);
+    --text-dark-100: rgb(12 12 21);
+    --text-dark-200: rgb(52 52 52);
+    --text-dark-300: rgb(88 88 88);
+    --fill-gray-500: #5b5b5b;
+
+    color-scheme: light;
+}
+
+html {
+    font-family: 
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        Segoe UI,
+        Roboto,
+        Helvetica Neue,
+        Arial,
+        Noto Sans,
+        sans-serif,
+        Apple Color Emoji,
+        Segoe UI Emoji,
+        Segoe UI Symbol,
+        Noto Color Emoji;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-dark-400);
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+img {
+    max-width: 100%;
+}
+
+a.subsection-image:hover {
+    text-decoration: none;
+}
+
+.navbar {
+    /* top: 0; */
+    /* left: 0; */
+    /* position: sticky; */
+    display: flex;
+    padding: 0.5rem;
+    justify-content: space-between;
+    background: black;
+    opacity: .7;
+}
+
+.navbar-items {
+    padding: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.navbar-item {
+    padding: 0.75rem;
+    border-radius: 0.25rem;
+    color: rgb(255 255 255);
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.navbar-item:hover {
+    background-color: var(--navbar-item-hover-background);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.navbar-item-icon {
+    fill: white;
+}
+
+.section-title {
+    margin: 0rem 8rem;
+    padding: 16px 24px 16px 24px;
+    color: var(--text-dark-50);
+    font-weight: 700;
+    font-size: 3.75rem;
+    text-decoration: none;
+}
+
+.subsection {
+    background-color: var(--bg-dark-500);
+    padding: 16px 24px 16px 24px;
+    text-align: justify;
+}
+
+.subsection-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 3rem;
+    margin: 0rem 8rem;
+    flex-wrap: nowrap;
+}
+
+.subsection-item {
+    flex: 1 1;
+}
+
+.subsection-text-container {
+    order: 1;
+}
+
+.subsection-image {
+    align-self: center;
+    margin-right: auto;
+    margin-left: auto;
+    order: 2;
+    display: flex;
+    justify-content: center;
+}
+
+.subsection:nth-child(odd) {
+    background-color: var(--bg-dark-400);
+    .subsection-text-container {
+        order: 3
+    }
+}
+
+.subsection-title {
+    font-weight: 700;
+    font-size: 2.25rem;
+    color: var(--text-dark-50);
+    text-decoration: none;
+}
+
+.subsection-short {
+    padding-top: 0.25rem;
+    font-size: 1.25rem;
+    color: var(--text-dark-100);
+}
+
+.subsection-title,.subsection-short {
+    padding-top: 1rem;
+}
+
+.subsection-main {
+    padding-top: 0.25rem;
+    color: var(--text-dark-200);
+}
+
+.subsection-note {
+    font-size: .875rem;
+    padding-top: 0.25rem;
+    color: var(--text-dark-300);
+}
+
+.subsection-link-container {
+    padding-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    color: var(--text-dark-300);
+}
+
+.subsection-link-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-decoration: none;
+    text-decoration-color: var(--text-dark-300);
+    gap: 0.25rem;
+}
+
+.subsection-link-item:hover {
+    fill: var(--fill-gray-500);
+    text-decoration: underline;
+    transition: ease .2s;
+    text-decoration-color: var(--text-dark-300);
+}
+
+.subsection-link-icon {
+    height: 48px;
+    width: 48px;
+}
+
+.subsection-link-url {
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-dark-300);
+    width: 2.75rem;
+}
+
+.footer {
+    padding: 1rem 8rem;
+    color: var(--text-dark-50);
+    background-color: var(--bg-dark-700);
+}
+
+.divider {
+    border-width: 0.0625rem 0px 0px;
+    border-top-style: solid;
+    border-radius: 0.25rem;
+    margin: 0.75rem 0px;
+}
+
+.footer-items {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+}
+
+.footer-icon-container {
+    display: flex;
+    column-gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.footer-icon {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-dark-50);
+}
+
+.made-by {
+    display: inline-block;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.text-url {
+    font-style: italic;
+    text-decoration: underline;
+    color: var(--text-dark-50);
+}
+
+.feedboard {
+    position: relative;
+    padding: 0rem 8rem;
+    padding: 16px 24px 16px 24px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    margin-right: 8rem;
+    margin-left: 8rem;
+}
+
+.feedboard-title {
+    padding-bottom: 1rem;
+    font-weight: 700;
+    font-size: 2.25rem;
+    color: var(--text-dark-50);
+    text-decoration: none;
+}
+
+.feedboard-description {
+    font-size: 1.5rem;
+    color: var(--text-dark-100);
+    padding-bottom: 1rem;
+}
+
+.feedboard-background-image {
+    background-image: url(https://images.evetech.net/corporations/98684728/logo?size=256);
+    opacity: 0.1;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: contain;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    z-index: -50;
+}
+
+.feedboard-kills-container {
+    padding: 1rem;
+    overflow-x: auto;
+    gap: 2rem;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.feedboard-kills-item {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.feedboard-character {
+    text-align: center;
+    padding: 0.25rem 0rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--text-dark-50);
+    text-decoration: none;
+}
+
+.feedboard-kills-item-image-container {
+    padding-top: 1.25rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    border-radius: 0.25rem;
+    background-color: var(--bg-red-900);
+}
+
+.feedboard-kill-green-bg {
+    background-color: var(--bg-green-900);
+}
+
+.feedboard-kills-item-image {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 128px;
+    height: 128px;
+}
+
+.feedboard-kills-item-image img {
+    display: block;
+    border-radius: 0.25rem;
+}
+
+.feedboard-isk {
+    color: var(--text-white);
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+.aoc-logo {
+    text-shadow: rgb(0 204 0) 0px 0px 2px, rgb(0 204 0) 0px 0px 5px;
+    color: rgb(0 204 0);
+    font-size: 3.75rem;
+    line-height: 1;
+}
+
+@media only screen and (max-width: 700px) {
+    .section-title {
+        font-size: 3rem;
+        margin: 0rem 4rem;
+    }
+
+    .subsection-container {
+        display: grid;
+        margin: 0rem 4rem;
+    }
+
+    .subsection-text-container {
+        order: 1;
+    }
+
+    .subsection-image {
+        justify-self: center;
+    }
+
+    .subsection:nth-child(odd) {
+        .subsection-text-container {
+            order: 1;
+        }
+    }
+
+    .feedboard {
+        margin: 0rem 4rem;
+        padding: 16px 24px 16px 24px;
+    }
+
+    .footer {
+        padding: 1rem 4rem;
+    }
+}
