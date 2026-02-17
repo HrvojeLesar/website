@@ -1,0 +1,28 @@
+{
+    "title": {
+        "title": "Master's thesis",
+        "url": "https://github.com/HrvojeLesar/rpg-battle-monitoring-platform/"
+    },
+    "short_text": "Implementation of a Platform for Battle Monitoring in Role Playing Games",
+    "main_text": "System agnostic platform that supports and facilitates custom implementations for tabletop RPG systems. The platform implements some of <a href=\"https://en.wikipedia.org/wiki/Dungeons_&_Dragons\" class=\"text-url\">Dungeons & Dragons</a> systems and allows easy extension of existing systems. Fully networked and synced across multiple connected clients.",
+    "note_text": "Thesis is only available in Croatian.",
+    "image": {
+        "src": "rpg-batle-monitor.png",
+        "alt": "Battle example",
+        "url": "https://github.com/HrvojeLesar/rpg-battle-monitoring-platform/"
+    },
+    "links": [
+        {
+            "title": "Source code",
+            "text": "Source code",
+            "url": "https://github.com/HrvojeLesar/rpg-battle-monitoring-platform/",
+            "icon": "github"
+        },
+        {
+            "title": "Master's thesis pdf",
+            "text": "Master's thesis pdf",
+            "url": "/static/documents/izrada_platforme_za_pracenje_bitke_u_igri_igranja_uloga.pdf",
+            "icon": "book"
+        }
+    ]
+}
