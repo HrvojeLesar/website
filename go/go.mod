@@ -11,8 +11,6 @@ require (
 
 require (
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gotnospirit/makeplural v0.0.0-20180622080156-a5f48d94d976 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/text v0.3.2 // indirect
 )
