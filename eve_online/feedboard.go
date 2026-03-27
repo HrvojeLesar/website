@@ -1,4 +1,4 @@
-package main
+package eveonline
 
 import (
 	"compress/gzip"
@@ -338,7 +338,7 @@ func fetchCharacter(charId int64) (*EsiCharacter, error) {
 	return &character, nil
 }
 
-func (e *Esi) fetchFiftyFiftyFiftyFeeds() error {
+func (e *Esi) FetchFiftyFiftyFiftyFeeds() error {
 	zkillboard := CorporationZkillboard{CorporationId: 98684728}
 	err := zkillboard.fetchKillmails()
 	if err != nil {
@@ -352,7 +352,7 @@ func (e *Esi) fetchFiftyFiftyFiftyFeeds() error {
 	return nil
 }
 
-func (e *Esi) handleWebsocketKillmail(km *ZkillWebsocketSimpleKillmail) {
+func (e *Esi) HandleWebsocketKillmail(km *ZkillWebsocketSimpleKillmail) {
 	esiKillmail, err := fetchKillmail(km.KillId, *km.Hash)
 	if err != nil {
 		log.Println(err)

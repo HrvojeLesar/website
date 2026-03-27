@@ -7,13 +7,15 @@ import (
 	"log"
 	"os"
 	"sort"
+
+	eveonline "github.com/HrvojeLesar/website/eve_online"
 )
 
 type ImageType string
 
 const (
 	Img  ImageType = "image"
-	HTML           = "HTML"
+	HTML ImageType = "HTML"
 )
 
 type Section struct {
@@ -50,14 +52,14 @@ type SubsectionLink struct {
 
 type SectionsWrapper struct {
 	Sections  []Section
-	Killmails []FeedboardKillmail
+	Killmails []eveonline.FeedboardKillmail
 }
 
 type Image struct {
 	Src  *template.HTML `json:"src"`
 	Alt  *string        `json:"alt"`
 	Url  *string        `json:"url"`
-	Type *string        `json:"type"`
+	Type *ImageType     `json:"type"`
 }
 
 func (i *Image) IsRawHTML() bool {
@@ -67,7 +69,7 @@ func (i *Image) IsRawHTML() bool {
 	return *i.Type == HTML
 }
 
-func newSections(killmails []FeedboardKillmail) SectionsWrapper {
+func newSections(killmails []eveonline.FeedboardKillmail) SectionsWrapper {
 	sections := SectionsWrapper{
 		Killmails: killmails,
 	}
@@ -98,11 +100,12 @@ func (s *SectionsWrapper) readSubsections() {
 		section.Subsections = make([]Subsection, 0)
 		sectionDirPath := fmt.Sprintf("website_docs/%s", section.Title)
 		sectionDir, err := os.Open(sectionDirPath)
-		defer sectionDir.Close()
 		if err != nil {
 			log.Println(err)
 			continue
 		}
+		defer sectionDir.Close()
+
 		files, err := sectionDir.ReadDir(0)
 		if err != nil {
 			log.Println(err)

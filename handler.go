@@ -7,17 +7,19 @@ import (
 	"log"
 	"net/http"
 	"sync"
+
+	eveonline "github.com/HrvojeLesar/website/eve_online"
 )
 
 type ServeHandler struct {
 	mainTemplate *template.Template
-	Esi          *Esi
+	Esi          *eveonline.Esi
 
 	executedTemplate bytes.Buffer
 	mutex            sync.Mutex
 }
 
-func NewServeHandler(esi *Esi) *ServeHandler {
+func NewServeHandler(esi *eveonline.Esi) *ServeHandler {
 	sh := ServeHandler{
 		Esi: esi,
 	}
@@ -52,7 +54,7 @@ func (sh *ServeHandler) makeTemplate() {
 	}
 }
 
-func (sh *ServeHandler) executeTemplate(w io.Writer, killmails []FeedboardKillmail) error {
+func (sh *ServeHandler) executeTemplate(w io.Writer, killmails []eveonline.FeedboardKillmail) error {
 	sectionWrapper := newSections(killmails)
 	err := sh.mainTemplate.Execute(w, sectionWrapper)
 	if err != nil {

@@ -1,4 +1,4 @@
-package main
+package eveonline
 
 import (
 	"bytes"
@@ -183,7 +183,7 @@ type FeedboardWebsocketServer struct {
 	templateBuilderMux      sync.Mutex
 }
 
-func newFeedboardWebsocketServer() *FeedboardWebsocketServer {
+func NewFeedboardWebsocketServer() *FeedboardWebsocketServer {
 	return &FeedboardWebsocketServer{
 		KillmailChan:            make(chan FeedboardKillmail),
 		subscriberMessageBuffer: 16,

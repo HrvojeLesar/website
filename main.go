@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	eveonline "github.com/HrvojeLesar/website/eve_online"
 	"github.com/go-co-op/gocron"
 )
 
@@ -28,19 +29,19 @@ func main() {
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	feedboardWebsockerServer := newFeedboardWebsocketServer()
+	feedboardWebsockerServer := eveonline.NewFeedboardWebsocketServer()
 	feedboardWebsockerServer.KillmailListener()
 
-	esi := NewEsi(KILLMAILCOUNT, feedboardWebsockerServer.KillmailChan)
+	esi := eveonline.NewEsi(KILLMAILCOUNT, feedboardWebsockerServer.KillmailChan)
 
-	zkm := NewZkillWebsocketManager(esi.handleWebsocketKillmail, ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
+	zkm := eveonline.NewZkillWebsocketManager(esi.HandleWebsocketKillmail, eveonline.ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
 	zkm.Run()
 	serveHandler := NewServeHandler(esi)
 
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.Every(24).Hours().Do(func() {
 		log.Println("Fetching killmails")
-		err := esi.fetchFiftyFiftyFiftyFeeds()
+		err := esi.FetchFiftyFiftyFiftyFeeds()
 		if err != nil {
 			log.Println(err)
 		} else {
