@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
-	"nhooyr.io/websocket"
-	"nhooyr.io/websocket/wsjson"
+	"github.com/coder/websocket"
+	"github.com/coder/websocket/wsjson"
 )
 
 type ZkillWebsocketFilter struct {

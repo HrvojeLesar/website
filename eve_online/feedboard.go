@@ -18,10 +18,6 @@ import (
 const (
 	ZkillboardCorpEndpoint = "https://zkillboard.com/api/corporationID/"
 	ZkillboardKillEndpoint = "https://zkillboard.com/api/killID/"
-	UserAgentKey           = "User-Agent"
-	UserAgentValue         = "https://hrveklesarov.com/ Maintainer: Hrvoje (hrvoje.lesar1@hotmail.com)"
-	AcceptEncodingKey      = "Accept-Encoding"
-	AcceptEncodingValue    = "gzip"
 	Capsule                = 670
 )
 
@@ -66,7 +62,7 @@ func (zk *ZkillboardKillmail) fetchKillmail() error {
 	}
 
 	for response.StatusCode == http.StatusTooManyRequests {
-        log.Println("Too many requests\n Retrying in 5 seconds")
+		log.Println("Too many requests\n Retrying in 5 seconds")
 		time.Sleep(5 * time.Second)
 		response, err = http.DefaultClient.Do(request)
 		if err != nil {
@@ -393,14 +389,6 @@ func (e *Esi) HandleWebsocketKillmail(km *ZkillWebsocketSimpleKillmail) {
 	e.appendKillmailToStart(killmail)
 	e.sendKillmailToWebsocket(killmail)
 	e.sendKillmailsToStaticTemplate()
-	e.Mutext.Unlock()
-}
-
-func (e *Esi) setKillmails(killmails []FeedboardKillmail) {
-	e.Mutext.Lock()
-
-	e.Killmails = killmails
-
 	e.Mutext.Unlock()
 }
 
