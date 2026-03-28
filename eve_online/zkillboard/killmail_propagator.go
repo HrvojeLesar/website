@@ -6,9 +6,9 @@ import (
 )
 
 type killmailPropagator struct {
-	channels              []chan *Killmail
+	channels              []chan<- *Killmail
 	channelsMutex         sync.Mutex
-	externalSenderChannel chan *Killmail
+	externalSenderChannel <-chan *Killmail
 	started               bool
 }
 
