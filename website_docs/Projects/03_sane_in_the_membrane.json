@@ -1,0 +1,21 @@
+{
+    "title": {
+        "title": "Sane in the membrane",
+        "url": "https://github.com/HrvojeLesar/sane_in_the_membrane"
+    },
+    "short_text": "Desktop program and server for interacting with SANE compatible scanners",
+    "main_text": "Project aims to solve a very specific problems for using <a href=\"https://www.sane-project.org/\" class=\"text-url\">SANE</a> compatible scanners over the network on clients with different operating systems. Using this program clients should be able to scan without any drivers only depending on the server to know how to interact with scanners.",
+    "image": {
+        "src": "sitm.png",
+        "alt": "Sane in the membrane GUI image",
+        "url": "https://github.com/HrvojeLesar/sane_in_the_membrane"
+    },
+    "links": [
+        {
+            "title": "Source code",
+            "text": "Source code",
+            "url": "https://github.com/HrvojeLesar/sane_in_the_membrane",
+            "icon": "github"
+        }
+    ]
+}
