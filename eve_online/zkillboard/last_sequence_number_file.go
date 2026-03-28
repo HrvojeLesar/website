@@ -37,7 +37,7 @@ func (sequenceFile *sequenceFile) LastSaved() (SequenceNumber, error) {
 }
 
 func (sequenceFile *sequenceFile) Save(sequenceNumber SequenceNumber) error {
-	err := os.WriteFile(filePath, []byte(strconv.Itoa(int(sequenceNumber.Sequence))), filePermissioins)
+	err := os.WriteFile(filePath, []byte(strconv.FormatUint(sequenceNumber.Sequence, 10)), filePermissioins)
 	if err != nil {
 		return err
 	}

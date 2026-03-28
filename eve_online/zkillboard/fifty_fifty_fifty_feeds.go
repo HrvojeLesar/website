@@ -90,6 +90,10 @@ func (f *fiftyFiftyFiftyFeeds) fetchKillmailInfo(corpKillmails []CorporationKill
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		esiKillmail, err := esi.EsiKillmail.Fetch(int64(corpKillmail.KillmailID), corpKillmail.Zkb.Hash, ctx)
 		cancel()
+		if err != nil {
+			slog.Error("Failed to fetch esi killmail", "error", err)
+			continue
+		}
 
 		killmail := KillmailConverter.FromEsiAndCorporationKillmail(esiKillmail, corpKillmail)
 		err = killmail.FetchCharacters()
