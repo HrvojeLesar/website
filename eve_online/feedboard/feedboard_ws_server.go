@@ -53,6 +53,10 @@ func (server *feedboardWebsocketServer) StartKillmailListener(killmailchan chan 
 		var templateBuffer bytes.Buffer
 		for {
 			killmail := <-killmailchan
+			if killmail.Victim == nil || killmail.FinalBlow == nil {
+				slog.Error("Skipping templating killmail, missing victim or final blow character", "Victim", killmail.Victim, "FinalBlow", killmail.FinalBlow)
+				continue
+			}
 			server.templateBuilderMutex.Lock()
 			slog.Debug("Received killmail", "id", killmail.KillmailID)
 			templ := template.Must(template.ParseFiles("templates/feedboard_item.html"))

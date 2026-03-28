@@ -8,7 +8,7 @@ import (
 	"os"
 	"sort"
 
-	eveonline "github.com/HrvojeLesar/website/eve_online"
+	"github.com/HrvojeLesar/website/eve_online/zkillboard"
 )
 
 type ImageType string
@@ -52,7 +52,7 @@ type SubsectionLink struct {
 
 type SectionsWrapper struct {
 	Sections  []Section
-	Killmails []eveonline.FeedboardKillmail
+	Killmails []zkillboard.Killmail
 }
 
 type Image struct {
@@ -69,7 +69,7 @@ func (i *Image) IsRawHTML() bool {
 	return *i.Type == HTML
 }
 
-func newSections(killmails []eveonline.FeedboardKillmail) SectionsWrapper {
+func newSections(killmails []zkillboard.Killmail) SectionsWrapper {
 	sections := SectionsWrapper{
 		Killmails: killmails,
 	}

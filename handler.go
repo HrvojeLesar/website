@@ -13,21 +13,20 @@ import (
 
 type ServeHandler struct {
 	mainTemplate *template.Template
-	Esi          *eveonline.Esi
 
 	executedTemplate bytes.Buffer
 	mutex            sync.Mutex
 }
 
 func NewServeHandler(esi *eveonline.Esi) *ServeHandler {
-	sh := ServeHandler{
-		Esi: esi,
-	}
+	sh := ServeHandler{}
 	sh.makeTemplate()
 	sh.listenForKillmailUpdates()
 	return &sh
 }
 
+// Mark template as dirty and rerender it when actually serving
+// Be lazy and only do work when requested
 func (sh *ServeHandler) listenForKillmailUpdates() {
 	go func() {
 		for {

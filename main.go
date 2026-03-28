@@ -8,6 +8,8 @@ import (
 	"time"
 
 	eveonline "github.com/HrvojeLesar/website/eve_online"
+	"github.com/HrvojeLesar/website/eve_online/feedboard"
+	"github.com/HrvojeLesar/website/eve_online/zkillboard"
 	"github.com/go-co-op/gocron"
 )
 
@@ -22,20 +24,15 @@ func port() string {
 	} else {
 		return ":3000"
 	}
-
 }
 
 func main() {
-
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	feedboardWebsockerServer := eveonline.NewFeedboardWebsocketServer()
-	feedboardWebsockerServer.KillmailListener()
+	zkillboardR2Z2 := zkillboard.Zkillboard.NewZkillboardR2Z2(zkillboard.Zkillboard.DefaultKillmailFilterFunc)
+	zkillboardR2Z2.Start()
+	websocketServer := feedboard.FeedboardWebsocketServerBuilder.New(zkillboardR2Z2.KillMailsChan)
 
-	esi := eveonline.NewEsi(KILLMAILCOUNT, feedboardWebsockerServer.KillmailChan)
-
-	zkm := eveonline.NewZkillWebsocketManager(esi.HandleWebsocketKillmail, eveonline.ZkillWebsocketFilter{Action: "sub", Channel: "corporation:98684728"})
-	zkm.Run()
 	serveHandler := NewServeHandler(esi)
 
 	scheduler := gocron.NewScheduler(time.UTC)
@@ -52,7 +49,7 @@ func main() {
 	scheduler.Every(5).Minutes().Do(serveHandler.PeriodicDocRerender)
 
 	http.HandleFunc("/", serveHandler.Handle)
-	http.HandleFunc("/feedboard-subscribe", feedboardWebsockerServer.SubscribeHandler)
+	http.HandleFunc("/feedboard-subscribe", websocketServer.SubscribeHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	fmt.Printf("Listening on http://localhost%s\n", port())

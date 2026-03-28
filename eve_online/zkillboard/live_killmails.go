@@ -2,6 +2,7 @@ package zkillboard
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -9,63 +10,34 @@ import (
 
 type zkillboard struct{}
 
+const FIFTY_FIFTY_FIFTY_CORPORATION_ID = 98684728
+
 var Zkillboard zkillboard
-
-type Killmail struct {
-	KillmailID      int    `json:"killmail_id"`
-	Hash            string `json:"hash"`
-	UploadedAt      int64  `json:"uploaded_at"`
-	SequenceID      int    `json:"sequence_id"`
-	SequenceUpdated *bool  `json:"sequence_updated"`
-
-	Esi struct {
-		KillmailID    int    `json:"killmail_id"`
-		KillmailTime  string `json:"killmail_time"`
-		SolarSystemID int    `json:"solar_system_id"`
-
-		Attackers []struct {
-			AllianceID     int     `json:"alliance_id"`
-			CharacterID    int     `json:"character_id"`
-			CorporationID  int     `json:"corporation_id"`
-			DamageDone     int     `json:"damage_done"`
-			FinalBlow      bool    `json:"final_blow"`
-			SecurityStatus float64 `json:"security_status"`
-			ShipTypeID     int     `json:"ship_type_id"`
-			WeaponTypeID   int     `json:"weapon_type_id"`
-		} `json:"attackers"`
-
-		Victim struct {
-			CharacterID   int `json:"character_id"`
-			CorporationID int `json:"corporation_id"`
-			DamageTaken   int `json:"damage_taken"`
-			FactionID     int `json:"faction_id"`
-			ShipTypeID    int `json:"ship_type_id"`
-		} `json:"victim"`
-	} `json:"esi"`
-
-	ZKB struct {
-		LocationID     int     `json:"locationID"`
-		Hash           string  `json:"hash"`
-		FittedValue    float64 `json:"fittedValue"`
-		DroppedValue   float64 `json:"droppedValue"`
-		DestroyedValue float64 `json:"destroyedValue"`
-		TotalValue     float64 `json:"totalValue"`
-		NPC            bool    `json:"npc"`
-		Solo           bool    `json:"solo"`
-		Awox           bool    `json:"awox"`
-		AttackerCount  int     `json:"attackerCount"`
-		Href           string  `json:"href"`
-	} `json:"zkb"`
-}
 
 type zkillboardR2Z2 struct {
 	KillMailsChan chan *Killmail
+	filterFunc    func(*Killmail) bool
 }
 
-func (zkillboard *zkillboard) NewZkillboardR2Z2() zkillboardR2Z2 {
+func (zkillboard *zkillboard) NewZkillboardR2Z2(filterFunc func(*Killmail) bool) zkillboardR2Z2 {
 	return zkillboardR2Z2{
 		KillMailsChan: make(chan *Killmail, 10),
+		filterFunc:    filterFunc,
 	}
+}
+
+func (zkillboard *zkillboard) DefaultKillmailFilterFunc(killmail *Killmail) bool {
+	if killmail.Esi.Victim.CorporationID == FIFTY_FIFTY_FIFTY_CORPORATION_ID {
+		return true
+	}
+
+	for idx := range killmail.Esi.Attackers {
+		if killmail.Esi.Attackers[idx].CorporationID == FIFTY_FIFTY_FIFTY_CORPORATION_ID {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (r2z2 *zkillboardR2Z2) Start() {
@@ -90,16 +62,20 @@ func (r2z2 *zkillboardR2Z2) getLatestSequence() (*SequenceNumber, error) {
 	}
 
 	if apiError == nil && fileError != nil {
+		slog.Error(fmt.Sprintf("No api error, sequence %v %v", zkillSequenceNumber, zkillSequenceNumber.Sequence))
 		return &zkillSequenceNumber, nil
 	}
 
 	if apiError != nil && fileError == nil {
+		slog.Error(fmt.Sprintf("No file error, sequence %v", savedSequenceNumber))
 		return &savedSequenceNumber, nil
 	}
 
 	if zkillSequenceNumber.Sequence > savedSequenceNumber.Sequence {
+		slog.Error(fmt.Sprintf("No errors, saved sequence: %v", savedSequenceNumber))
 		return &savedSequenceNumber, nil
 	} else {
+		slog.Error(fmt.Sprintf("No errors, zkill sequence: %v", savedSequenceNumber))
 		return &zkillSequenceNumber, nil
 	}
 }
@@ -109,6 +85,10 @@ func (r2z2 *zkillboardR2Z2) startFetchingSequences(sequenceNumber SequenceNumber
 		context, cancelContext := context.WithTimeout(context.Background(), 5*time.Second)
 		killmail, err := KillmailFetcherApiEndpoint.Fetch(sequenceNumber, context)
 		cancelContext()
+
+		if !errors.Is(err, SequenceNumberNotFoundError) {
+			sequenceNumber.Sequence += 1
+		}
 
 		if err != nil {
 			slog.Error(fmt.Sprintf("Failed to fetch killmail on sequence number: %d. Error: %v", sequenceNumber.Sequence, err))
@@ -121,9 +101,10 @@ func (r2z2 *zkillboardR2Z2) startFetchingSequences(sequenceNumber SequenceNumber
 			panic("Killmail was expected to be not nil, got nil")
 		}
 
-		sequenceNumber.Sequence += 1
-
-		r2z2.KillMailsChan <- killmail
+		if r2z2.filterFunc == nil || r2z2.filterFunc(killmail) {
+			_ = killmail.FetchCharacters()
+			r2z2.KillMailsChan <- killmail
+		}
 
 		// Keeps poll rate at 10/s
 		time.Sleep(100 * time.Millisecond)
