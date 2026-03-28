@@ -126,6 +126,6 @@ func (killmail *Killmail) IsFiftyFiftyFiftyKill() bool {
 	return killmail.Victim.CorporationId != FIFTY_FIFTY_FIFTY_CORPORATION_ID
 }
 
-func (killmail *Killmail) isWorthlessCapsule() bool {
+func (killmail *Killmail) IsWorthlessCapsule() bool {
 	return killmail.Esi.Victim.ShipTypeID == Capsule && killmail.Zkb.TotalValue <= CapsuleIsk
 }

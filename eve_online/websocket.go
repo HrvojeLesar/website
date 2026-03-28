@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/HrvojeLesar/website/templates"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
@@ -282,7 +283,7 @@ func (fws *FeedboardWebsocketServer) KillmailListener() {
 			killmail := <-fws.KillmailChan
 			fws.templateBuilderMux.Lock()
 			log.Println("Received killmail id", killmail.KillmailId())
-			templ := template.Must(template.ParseFiles("templates/feedboard_item.html"))
+			templ := template.Must(template.ParseFS(templates.HTMLTemplates, "feedboard_item.html"))
 			err := templ.Execute(&templateBuffer, &killmail)
 			if err != nil {
 				log.Println(err)

@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	eveonline "github.com/HrvojeLesar/website/eve_online"
+	"github.com/HrvojeLesar/website/templates"
 )
 
 type ServeHandler struct {
@@ -46,7 +47,7 @@ func (sh *ServeHandler) listenForKillmailUpdates() {
 }
 
 func (sh *ServeHandler) makeTemplate() {
-	sh.mainTemplate = template.Must(template.ParseFiles("templates/_index.html", "templates/feedboard.html", "templates/feedboard_item.html"))
+	sh.mainTemplate = template.Must(template.ParseFS(templates.HTMLTemplates, "_index.html", "feedboard.html", "feedboard_item.html"))
 	err := sh.executeTemplate(&sh.executedTemplate, nil)
 	if err != nil {
 		log.Println(err)

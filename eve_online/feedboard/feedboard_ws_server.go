@@ -12,6 +12,7 @@ import (
 	"time"
 
 	zkillboard "github.com/HrvojeLesar/website/eve_online/zkillboard"
+	"github.com/HrvojeLesar/website/templates"
 	"github.com/coder/websocket"
 )
 
@@ -48,18 +49,22 @@ func (server *feedboardWebsocketServer) SubscribeHandler(writer http.ResponseWri
 	}
 }
 
-func (server *feedboardWebsocketServer) StartKillmailListener(killmailchan chan *zkillboard.Killmail) {
+func (server *feedboardWebsocketServer) StartKillmailListener() {
 	go func() {
 		var templateBuffer bytes.Buffer
 		for {
-			killmail := <-killmailchan
+			killmail := <-server.KillmailReceiverChannel
 			if killmail.Victim == nil || killmail.FinalBlow == nil {
 				slog.Error("Skipping templating killmail, missing victim or final blow character", "Victim", killmail.Victim, "FinalBlow", killmail.FinalBlow)
 				continue
 			}
+			if killmail.IsWorthlessCapsule() {
+				slog.Info("Skipping templating killmail, worthless capsule")
+				continue
+			}
 			server.templateBuilderMutex.Lock()
 			slog.Debug("Received killmail", "id", killmail.KillmailID)
-			templ := template.Must(template.ParseFiles("templates/feedboard_item.html"))
+			templ := template.Must(template.ParseFS(templates.HTMLTemplates, "feedboard_item.html"))
 			err := templ.Execute(&templateBuffer, &killmail)
 			if err != nil {
 				slog.Error("Failed to parse template", "error", err)

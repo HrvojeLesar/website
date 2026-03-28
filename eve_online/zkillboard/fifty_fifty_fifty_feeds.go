@@ -92,6 +92,11 @@ func (f *fiftyFiftyFiftyFeeds) fetchKillmailInfo(corpKillmails []CorporationKill
 				return
 			}
 
+			if killmail.IsWorthlessCapsule() {
+				slog.Info("Detected worthless capsule, skipping killmail")
+				return
+			}
+
 			killmailsMutex.Lock()
 			defer killmailsMutex.Unlock()
 			killmails = append(killmails, &killmail)
