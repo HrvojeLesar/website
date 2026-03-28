@@ -1,14 +1,11 @@
 package esi
 
 import (
-	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
-
-	eveonline "github.com/HrvojeLesar/website/eve_online"
 )
 
 const esiKillmailEndpointFormat = "https://esi.evetech.net/latest/killmails/%d/%s/?datasource=tranquility"
@@ -43,27 +40,19 @@ type ESIKillmail struct {
 }
 
 func (endpoint *esiKillmailEndpoint) Fetch(killmailid int64, hash string, ctx context.Context) (*ESIKillmail, error) {
-	request, err := eveonline.CustomRequest.New(ctx, http.MethodGet, fmt.Sprintf(esiKillmailEndpointFormat, killmailid, hash), nil)
-	if err != nil {
-		slog.Error("Failed to create Esikillmail request", "error", err)
-		return nil, err
-	}
-
-	response, err := http.DefaultClient.Do(request)
+	response, err := http.Get(fmt.Sprintf(esiKillmailEndpointFormat, killmailid, hash))
 	if err != nil {
 		slog.Error("Esikillmail response failed", "error", err)
 		return nil, err
 	}
+	defer response.Body.Close()
 
-	gzipReader, err := gzip.NewReader(response.Body)
-	if err != nil {
-		slog.Error("GZip reader creation failed", "error", err)
-		return nil, err
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Unexpected status code: %d", response.StatusCode)
 	}
-	defer gzipReader.Close()
 
 	var killmail ESIKillmail
-	if err := json.NewDecoder(gzipReader).Decode(&killmail); err != nil {
+	if err := json.NewDecoder(response.Body).Decode(&killmail); err != nil {
 		slog.Error("Failed to parse esi killmail json", "error", err)
 		return nil, err
 	}

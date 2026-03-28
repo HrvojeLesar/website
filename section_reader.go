@@ -52,7 +52,7 @@ type SubsectionLink struct {
 
 type SectionsWrapper struct {
 	Sections  []Section
-	Killmails []zkillboard.Killmail
+	Killmails []*zkillboard.Killmail
 }
 
 type Image struct {
@@ -69,7 +69,7 @@ func (i *Image) IsRawHTML() bool {
 	return *i.Type == HTML
 }
 
-func newSections(killmails []zkillboard.Killmail) SectionsWrapper {
+func newSections(killmails []*zkillboard.Killmail) SectionsWrapper {
 	sections := SectionsWrapper{
 		Killmails: killmails,
 	}

@@ -30,6 +30,7 @@ var FeedboardWebsocketServerBuilder feedboardWebsocketServerBuilder
 func (builder *feedboardWebsocketServerBuilder) New(killmailChannel chan *zkillboard.Killmail) feedboardWebsocketServer {
 	return feedboardWebsocketServer{
 		KillmailReceiverChannel: killmailChannel,
+		subscribers:             make(map[*feedboardSubscriber]struct{}),
 	}
 }
 
@@ -58,10 +59,17 @@ func (server *feedboardWebsocketServer) StartKillmailListener() {
 				slog.Error("Skipping templating killmail, missing victim or final blow character", "Victim", killmail.Victim, "FinalBlow", killmail.FinalBlow)
 				continue
 			}
+
 			if killmail.IsWorthlessCapsule() {
 				slog.Info("Skipping templating killmail, worthless capsule")
 				continue
 			}
+
+			if killmail.IsNpcFeed() {
+				slog.Info("Detected npc feed, skipping killmail")
+				return
+			}
+
 			server.templateBuilderMutex.Lock()
 			slog.Debug("Received killmail", "id", killmail.KillmailID)
 			templ := template.Must(template.ParseFS(templates.HTMLTemplates, "feedboard_item.html"))
@@ -103,7 +111,6 @@ func (server *feedboardWebsocketServer) subscribe(ctx context.Context, writer ht
 		connectionMutex.Unlock()
 		return net.ErrClosed
 	}
-	connectionMutex.Lock()
 
 	ctx = acceptedConnection.CloseRead(ctx)
 

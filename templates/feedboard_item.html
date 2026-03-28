@@ -1,5 +1,6 @@
 {{ $feed := . }}
 <div class="feedboard-kills-item">
+  {{ if $feed.FinalBlow }}
   <div class="feedboard-character">
     <a
       href="https://zkillboard.com/character/{{ $feed.FinalBlow.Id }}/"
@@ -8,21 +9,23 @@
       {{ $feed.FinalBlow.Name }}
     </a>
   </div>
+  {{end}}
   <div
     class="feedboard-kills-item-image-container {{ if $feed.IsFiftyFiftyFiftyKill }} feedboard-kill-green-bg {{ end }}"
   >
     <a
       class="feedboard-kills-item-image"
-      href="https://zkillboard.com/kill/{{ $feed.KillmailId }}/"
+      href="https://zkillboard.com/kill/{{ $feed.KillmailID }}/"
       target="_blank"
     >
       <img
-        src="https://images.evetech.net/types/{{ $feed.ShipTypeId }}/render?size=128"
+        src="https://images.evetech.net/types/{{ $feed.Esi.Victim.ShipTypeID }}/render?size=128"
         alt="Image of a ship"
       />
     </a>
     <div class="feedboard-isk">{{ $feed.Isk }} ISK</div>
   </div>
+  {{ if $feed.Victim }}
   <div class="feedboard-character">
     <a
       href="https://zkillboard.com/character/{{ $feed.Victim.Id }}/"
@@ -31,4 +34,5 @@
       {{ $feed.Victim.Name }}
     </a>
   </div>
+  {{end}}
 </div>

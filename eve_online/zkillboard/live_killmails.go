@@ -88,6 +88,7 @@ func (r2z2 *zkillboardR2Z2) startFetchingSequences(sequenceNumber SequenceNumber
 
 		if !errors.Is(err, SequenceNumberNotFoundError) {
 			sequenceNumber.Sequence += 1
+			SequenceFile.Save(sequenceNumber)
 		}
 
 		if err != nil {

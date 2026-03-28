@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -11,10 +12,6 @@ import (
 	"github.com/HrvojeLesar/website/eve_online/feedboard"
 	"github.com/HrvojeLesar/website/eve_online/zkillboard"
 	"github.com/go-co-op/gocron"
-)
-
-const (
-	KILLMAILCOUNT int = 10
 )
 
 func port() string {
@@ -31,19 +28,25 @@ func main() {
 
 	zkillboardR2Z2 := zkillboard.Zkillboard.NewZkillboardR2Z2(zkillboard.Zkillboard.DefaultKillmailFilterFunc)
 	zkillboardR2Z2.Start()
-	websocketServer := feedboard.FeedboardWebsocketServerBuilder.New(zkillboardR2Z2.KillMailsChan)
 
-	serveHandler := NewServeHandler(esi)
+	feedsCacheChannel := make(chan *zkillboard.Killmail, 10)
+	feedCache := zkillboard.FiftyFiftyFiftyFeeds.NewCache(feedsCacheChannel, eveonline.KILLMAILCOUNT)
+
+	websocketListenerChannel := make(chan *zkillboard.Killmail, 10)
+	killmailPropagator := zkillboard.KillmailPropagator.New(zkillboardR2Z2.KillMailsChan)
+	killmailPropagator.AddListenerChannel(websocketListenerChannel)
+	killmailPropagator.AddListenerChannel(feedsCacheChannel)
+	killmailPropagator.Start()
+
+	websocketServer := feedboard.FeedboardWebsocketServerBuilder.New(websocketListenerChannel)
+	websocketServer.StartKillmailListener()
+
+	serveHandler := NewServeHandler(&feedCache)
 
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.Every(24).Hours().Do(func() {
-		log.Println("Fetching killmails")
-		err := esi.FetchFiftyFiftyFiftyFeeds()
-		if err != nil {
-			log.Println(err)
-		} else {
-			log.Println("Fetching successful")
-		}
+		slog.Info("Fetching killmails")
+		feedCache.FetchKillmails()
 	})
 
 	scheduler.Every(5).Minutes().Do(serveHandler.PeriodicDocRerender)

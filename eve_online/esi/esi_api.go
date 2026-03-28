@@ -1,7 +1,6 @@
 package esi
 
 import (
-	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -26,24 +25,18 @@ func (esiEndpoint *esiEndpoint) FetchCharacter(id int, ctx context.Context) (*ev
 		return cachedChar, nil
 	}
 
-	request, err := eveonline.CustomRequest.New(ctx, http.MethodGet, fmt.Sprintf(esiCharacterEndpointFormat, id), nil)
+	response, err := http.Get(fmt.Sprintf(esiCharacterEndpointFormat, id))
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
 
-	response, err := http.DefaultClient.Do(request)
-	if err != nil {
-		return nil, err
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Unexpected status code: %d", response.StatusCode)
 	}
-
-	gzipReader, err := gzip.NewReader(response.Body)
-	if err != nil {
-		return nil, err
-	}
-	defer gzipReader.Close()
 
 	character := eveonline.Character{Id: id}
-	if err := json.NewDecoder(gzipReader).Decode(&character); err != nil {
+	if err := json.NewDecoder(response.Body).Decode(&character); err != nil {
 		return nil, fmt.Errorf("Error decoding JSON: %v", err)
 	}
 

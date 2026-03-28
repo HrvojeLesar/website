@@ -12,7 +12,7 @@ var suffix = map[int]string{
 	4: "T",
 }
 
-func Format(value float64) string {
+func FormatIsk(value float64) string {
 	if value < 1000 {
 		return fmt.Sprintf("%.2f", value)
 	}

@@ -20,6 +20,20 @@ var FiftyFiftyFiftyFeeds fiftyFiftyFiftyFeeds
 
 const zkillboardCorpEndpointFormat = "https://zkillboard.com/api/corporationID/%d/"
 
+type fiftyFiftyFiftyFeedsCache struct {
+	feeds               []*Killmail
+	newKillmailsChannel chan *Killmail
+	dirty               bool
+	mutex               sync.Mutex
+	itemLimit           int
+}
+
+type FiftyFiftyFiftyFeedsCache interface {
+	SetNotDirty()
+	IsDirty() bool
+	Killmails() []*Killmail
+}
+
 func (f *fiftyFiftyFiftyFeeds) Fetch(ctx context.Context) []*Killmail {
 	request, err := eveonline.CustomRequest.New(ctx, http.MethodGet, f.corporationEndpointUrl(FIFTY_FIFTY_FIFTY_CORPORATION_ID), nil)
 	if err != nil {
@@ -30,6 +44,12 @@ func (f *fiftyFiftyFiftyFeeds) Fetch(ctx context.Context) []*Killmail {
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
 		slog.Error("FiftyFiftyFiftyFeeds response failed", "error", err)
+		return nil
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		slog.Error("Unexpected status code", "status code", response.StatusCode)
 		return nil
 	}
 
@@ -49,59 +69,103 @@ func (f *fiftyFiftyFiftyFeeds) Fetch(ctx context.Context) []*Killmail {
 	return f.fetchKillmailInfo(killmails)
 }
 
+func (f *fiftyFiftyFiftyFeeds) NewCache(newKillmailsChannel chan *Killmail, cacheItemLimit int) fiftyFiftyFiftyFeedsCache {
+	return fiftyFiftyFiftyFeedsCache{
+		newKillmailsChannel: newKillmailsChannel,
+		itemLimit:           cacheItemLimit,
+		feeds:               make([]*Killmail, 0, cacheItemLimit),
+	}
+}
+
 func (f *fiftyFiftyFiftyFeeds) corporationEndpointUrl(corporationId int) string {
 	return fmt.Sprintf(zkillboardCorpEndpointFormat, corporationId)
 }
 
 func (f *fiftyFiftyFiftyFeeds) fetchKillmailInfo(corpKillmails []CorporationKillmail) []*Killmail {
-	type result struct {
-		esiKillmail  *esi.ESIKillmail
-		corpKillmail *CorporationKillmail
-		err          error
-	}
-
-	killmailsChannel := make(chan result, 10)
+	killmails := make([]*Killmail, 0, len(corpKillmails))
 
 	for idx := range corpKillmails {
 		corpKillmail := &corpKillmails[idx]
 
-		go func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			esiKillmail, err := esi.EsiKillmail.Fetch(int64(corpKillmail.KillmailID), corpKillmail.Zkb.Hash, ctx)
-			cancel()
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		esiKillmail, err := esi.EsiKillmail.Fetch(int64(corpKillmail.KillmailID), corpKillmail.Zkb.Hash, ctx)
+		cancel()
 
-			killmailsChannel <- result{esiKillmail: esiKillmail, corpKillmail: corpKillmail, err: err}
-		}()
-	}
-
-	killmails := make([]*Killmail, 0, len(corpKillmails))
-	var killmailsMutex sync.Mutex
-
-	for range corpKillmails {
-		esiKillmailResult := <-killmailsChannel
-		if esiKillmailResult.err != nil {
-			slog.Error("Failed fetching esi killmail", "error", esiKillmailResult.err)
+		killmail := KillmailConverter.FromEsiAndCorporationKillmail(esiKillmail, corpKillmail)
+		err = killmail.FetchCharacters()
+		if err != nil {
+			slog.Error("Failed to fetch killmail characters", "error", err)
 			continue
 		}
 
-		killmail := KillmailConverter.FromEsiAndCorporationKillmail(esiKillmailResult.esiKillmail, esiKillmailResult.corpKillmail)
-		go func() {
-			err := killmail.FetchCharacters()
-			if err != nil {
-				slog.Error("Failed to fetch killmail characters", "error", err)
-				return
-			}
+		if killmail.IsWorthlessCapsule() {
+			slog.Info("Detected worthless capsule, skipping killmail")
+			continue
+		}
 
-			if killmail.IsWorthlessCapsule() {
-				slog.Info("Detected worthless capsule, skipping killmail")
-				return
-			}
+		if killmail.IsNpcFeed() {
+			slog.Info("Detected npc feed, skipping killmail")
+			continue
+		}
 
-			killmailsMutex.Lock()
-			defer killmailsMutex.Unlock()
-			killmails = append(killmails, &killmail)
-		}()
+		killmails = append([]*Killmail{&killmail}, killmails...)
+
+		if len(killmails) >= eveonline.KILLMAILCOUNT {
+			break
+		}
 	}
 
 	return killmails
+}
+
+func (cache *fiftyFiftyFiftyFeedsCache) FetchKillmails() {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	killmails := FiftyFiftyFiftyFeeds.Fetch(ctx)
+	cancel()
+
+	killmailsToAdd := min(len(killmails), cache.itemLimit)
+
+	cache.mutex.Lock()
+	for idx := range killmailsToAdd {
+		cache.addKillmail(killmails[idx])
+	}
+	cache.mutex.Unlock()
+}
+
+func (cache *fiftyFiftyFiftyFeedsCache) StartListening() {
+	go func() {
+		for {
+			killmail := <-cache.newKillmailsChannel
+			if killmail == nil {
+				continue
+			}
+
+			cache.mutex.Lock()
+			cache.addKillmail(killmail)
+			cache.mutex.Unlock()
+		}
+	}()
+}
+
+func (cache *fiftyFiftyFiftyFeedsCache) addKillmail(killmail *Killmail) {
+	cache.feeds = append([]*Killmail{killmail}, cache.feeds...)
+	if len(cache.feeds) > cache.itemLimit {
+		cache.feeds = cache.feeds[:cache.itemLimit]
+	}
+
+	cache.dirty = true
+}
+
+func (cache *fiftyFiftyFiftyFeedsCache) IsDirty() bool {
+	return cache.dirty
+}
+
+func (cache *fiftyFiftyFiftyFeedsCache) Killmails() []*Killmail {
+	return cache.feeds
+}
+
+func (cache *fiftyFiftyFiftyFeedsCache) SetNotDirty() {
+	cache.mutex.Lock()
+	cache.dirty = false
+	cache.mutex.Unlock()
 }

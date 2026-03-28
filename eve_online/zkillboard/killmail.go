@@ -32,7 +32,7 @@ type Zkb struct {
 type Killmail struct {
 	KillmailID      int    `json:"killmail_id"`
 	Hash            string `json:"hash"`
-	SequenceUpdated *bool  `json:"sequence_updated"`
+	SequenceUpdated *int   `json:"sequence_updated"`
 
 	Esi esi.ESIKillmail `json:"esi"`
 
@@ -83,7 +83,7 @@ func (killmail *Killmail) FetchCharacters() error {
 		victimCharacter, err := esi.EsiEndpoint.FetchCharacter(killmail.Esi.Victim.CharacterID, victimFetchContext)
 		victimFetchCancel()
 
-		results[0] = fetchResult{
+		results[1] = fetchResult{
 			character: victimCharacter,
 			err:       err,
 		}
@@ -123,9 +123,17 @@ func (killmail *Killmail) findFinalBlowCharacterId() int {
 }
 
 func (killmail *Killmail) IsFiftyFiftyFiftyKill() bool {
-	return killmail.Victim.CorporationId != FIFTY_FIFTY_FIFTY_CORPORATION_ID
+	return killmail.Esi.Victim.CorporationID != FIFTY_FIFTY_FIFTY_CORPORATION_ID
 }
 
 func (killmail *Killmail) IsWorthlessCapsule() bool {
 	return killmail.Esi.Victim.ShipTypeID == Capsule && killmail.Zkb.TotalValue <= CapsuleIsk
+}
+
+func (killmail *Killmail) Isk() string {
+	return eveonline.FormatIsk(killmail.Zkb.TotalValue)
+}
+
+func (killmail *Killmail) IsNpcFeed() bool {
+	return killmail.Zkb.Npc
 }
