@@ -1,6 +1,7 @@
 package zkillboard
 
 import (
+	"fmt"
 	"log/slog"
 	"sync"
 )
@@ -32,6 +33,8 @@ func (propagator *killmailPropagator) Start() {
 	go func() {
 		for {
 			killmail := <-propagator.externalSenderChannel
+
+			slog.Info(fmt.Sprintf("Got killmail, propagating to `%d` listeners", len(propagator.channels)))
 
 			propagator.channelsMutex.Lock()
 			for _, channel := range propagator.channels {

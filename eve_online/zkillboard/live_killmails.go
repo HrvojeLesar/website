@@ -103,7 +103,11 @@ func (r2z2 *zkillboardR2Z2) startFetchingSequences(sequenceNumber SequenceNumber
 		}
 
 		if r2z2.filterFunc == nil || r2z2.filterFunc(killmail) {
-			_ = killmail.FetchCharacters()
+			err = killmail.FetchCharacters()
+			if err != nil {
+				slog.Error("Failed to fetch characters", "error", err)
+				continue
+			}
 			r2z2.KillMailsChan <- killmail
 		}
 
