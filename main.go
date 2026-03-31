@@ -23,6 +23,8 @@ func port() string {
 	}
 }
 
+// WARN: looks like getting kills while no websocket is connected does not update list correctly
+
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
@@ -31,6 +33,7 @@ func main() {
 
 	feedsCacheChannel := make(chan *zkillboard.Killmail, 10)
 	feedCache := zkillboard.FiftyFiftyFiftyFeeds.NewCache(feedsCacheChannel, eveonline.KILLMAILCOUNT)
+	feedCache.StartListening()
 
 	websocketListenerChannel := make(chan *zkillboard.Killmail, 10)
 	killmailPropagator := zkillboard.KillmailPropagator.New(zkillboardR2Z2.KillMailsChan)
