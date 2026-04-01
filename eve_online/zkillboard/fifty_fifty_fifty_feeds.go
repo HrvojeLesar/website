@@ -140,6 +140,7 @@ func (cache *fiftyFiftyFiftyFeedsCache) StartListening() {
 	go func() {
 		for {
 			killmail := <-cache.newKillmailsChannel
+			slog.Info("Got new killmail on cache listener")
 			if killmail == nil {
 				continue
 			}

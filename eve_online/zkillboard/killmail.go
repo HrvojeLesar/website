@@ -3,6 +3,7 @@ package zkillboard
 import (
 	"context"
 	"log/slog"
+	"math"
 	"sync"
 	"time"
 
@@ -46,6 +47,16 @@ type Killmail struct {
 type CorporationKillmail struct {
 	KillmailID int `json:"killmail_id"`
 	Zkb        Zkb `json:"zkb"`
+}
+
+type KillmailCollection []*Killmail
+
+type KillmailsTotalValue struct {
+	Wins      float64
+	Losses    float64
+	Total     float64
+	Kills     int
+	LostShips int
 }
 
 func (killmail *Killmail) FetchCharacters() error {
@@ -136,4 +147,44 @@ func (killmail *Killmail) Isk() string {
 
 func (killmail *Killmail) IsNpcFeed() bool {
 	return killmail.Zkb.Npc
+}
+
+func (killmailCollection KillmailCollection) TotalIskValue() KillmailsTotalValue {
+	totals := KillmailsTotalValue{
+		Wins:      0,
+		Losses:    0,
+		Total:     0,
+		Kills:     0,
+		LostShips: 0,
+	}
+
+	for _, killmail := range killmailCollection {
+		if killmail.IsFiftyFiftyFiftyKill() {
+			totals.Wins += killmail.Zkb.TotalValue
+			totals.Kills += 1
+			totals.Total += killmail.Zkb.TotalValue
+		} else {
+			totals.Losses += killmail.Zkb.TotalValue
+			totals.LostShips += 1
+			totals.Total -= killmail.Zkb.TotalValue
+		}
+	}
+
+	return totals
+}
+
+func (totals KillmailsTotalValue) IskTotal() string {
+	return eveonline.FormatIsk(math.Abs(totals.Total))
+}
+
+func (totals KillmailsTotalValue) IskWins() string {
+	return eveonline.FormatIsk(totals.Wins)
+}
+
+func (totals KillmailsTotalValue) IskLosses() string {
+	return eveonline.FormatIsk(totals.Losses)
+}
+
+func (totals KillmailsTotalValue) IsIskPositive() bool {
+	return totals.Total > 0
 }

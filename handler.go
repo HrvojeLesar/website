@@ -27,7 +27,7 @@ func NewServeHandler(feedCache zkillboard.FiftyFiftyFiftyFeedsCache) *ServeHandl
 }
 
 func (sh *ServeHandler) makeTemplate() {
-	sh.mainTemplate = template.Must(template.ParseFS(templates.HTMLTemplates, "_index.html", "feedboard.html", "feedboard_item.html"))
+	sh.mainTemplate = template.Must(template.ParseFS(templates.HTMLTemplates, "_index.html", "feedboard.html", "feedboard_item.html", "feedboard_isk_total.html"))
 	err := sh.executeTemplate(&sh.executedTemplate)
 	if err != nil {
 		log.Println(err)

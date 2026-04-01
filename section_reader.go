@@ -52,7 +52,7 @@ type SubsectionLink struct {
 
 type SectionsWrapper struct {
 	Sections  []Section
-	Killmails []*zkillboard.Killmail
+	Killmails zkillboard.KillmailCollection
 }
 
 type Image struct {

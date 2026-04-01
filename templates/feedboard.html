@@ -1,16 +1,19 @@
-{{ $feedboard := . }}
-{{ if $feedboard }}
+{{ $feedboard := . }} {{ if $feedboard }}
 <div class="feedboard">
     <div class="feedboard-title">
         <a href="https://zkillboard.com/corporation/98684728/">
             Fifty Fifty Fifty Feedboard
         </a>
     </div>
-    <div class="feedboard-description">Displaying latest {{ len $feedboard }} kills</div>
+    <div class="feedboard-description">
+        Showing {{ len $feedboard }} most recent kills and their ISK values
+    </div>
+    <div class="feedboard-isk-total-container">
+        {{template "feedboard_isk_total.html" $feedboard }}
+    </div>
     <div class="feedboard-kills-container">
-        {{ range $fIndex, $feed := $feedboard }}
-        {{ template "feedboard_item.html" $feed }}
-        {{ end }}
+        {{ range $fIndex, $feed := $feedboard }} {{ template
+        "feedboard_item.html" $feed }} {{ end }}
     </div>
     <div class="feedboard-background-image"></div>
 </div>

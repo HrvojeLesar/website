@@ -30,7 +30,7 @@ html.light {
 }
 
 html {
-    font-family: 
+    font-family:
         ui-sans-serif,
         system-ui,
         -apple-system,
@@ -77,7 +77,7 @@ a.subsection-image:hover {
     padding: 0.5rem;
     justify-content: space-between;
     background: black;
-    opacity: .7;
+    opacity: 0.7;
 }
 
 .navbar-items {
@@ -151,7 +151,7 @@ a.subsection-image:hover {
 .subsection:nth-child(odd) {
     background-color: var(--bg-dark-400);
     .subsection-text-container {
-        order: 3
+        order: 3;
     }
 }
 
@@ -168,7 +168,8 @@ a.subsection-image:hover {
     color: var(--text-dark-100);
 }
 
-.subsection-title,.subsection-short {
+.subsection-title,
+.subsection-short {
     padding-top: 1rem;
 }
 
@@ -178,7 +179,7 @@ a.subsection-image:hover {
 }
 
 .subsection-note {
-    font-size: .875rem;
+    font-size: 0.875rem;
     padding-top: 0.25rem;
     color: var(--text-dark-300);
 }
@@ -203,7 +204,7 @@ a.subsection-image:hover {
 .subsection-link-item:hover {
     fill: var(--fill-gray-500);
     text-decoration: underline;
-    transition: ease .2s;
+    transition: ease 0.2s;
     text-decoration-color: var(--text-dark-300);
 }
 
@@ -361,7 +362,9 @@ a.subsection-image:hover {
 }
 
 .aoc-logo {
-    text-shadow: rgb(0 204 0) 0px 0px 2px, rgb(0 204 0) 0px 0px 5px;
+    text-shadow:
+        rgb(0 204 0) 0px 0px 2px,
+        rgb(0 204 0) 0px 0px 5px;
     color: rgb(0 204 0);
     font-size: 3.75rem;
     line-height: 1;
@@ -400,4 +403,38 @@ a.subsection-image:hover {
     .footer {
         padding: 1rem 4rem;
     }
+}
+
+.feedboard-isk-total-container {
+    color: var(--text-dark-100);
+}
+
+.feedboard-isk-total {
+    text-decoration-thickness: 2px;
+}
+
+.feedboard-isk-loss {
+    color: var(--text-white);
+    text-decoration-color: var(--bg-red-900);
+}
+
+.feedboard-isk-win {
+    color: var(--text-white);
+    text-decoration-color: var(--bg-green-900);
+}
+
+.feedboard-isk-red-bg {
+    padding: 0.2rem;
+    background-color: var(--bg-red-900);
+    color: var(--text-white);
+}
+
+.feedboard-isk-green-bg {
+    padding: 0.2rem;
+    background-color: var(--bg-green-900);
+    color: var(--text-white);
+}
+
+.feedboard-isk-hint {
+    border-bottom: 1px dotted;
 }
