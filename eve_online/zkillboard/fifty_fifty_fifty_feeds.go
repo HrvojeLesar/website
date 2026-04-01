@@ -26,12 +26,13 @@ type fiftyFiftyFiftyFeedsCache struct {
 	dirty               bool
 	mutex               sync.Mutex
 	itemLimit           int
+	cacheUpdatedChannel chan KillmailCollection
 }
 
 type FiftyFiftyFiftyFeedsCache interface {
 	SetNotDirty()
 	IsDirty() bool
-	Killmails() []*Killmail
+	Killmails() KillmailCollection
 }
 
 func (f *fiftyFiftyFiftyFeeds) Fetch(ctx context.Context) []*Killmail {
@@ -69,11 +70,12 @@ func (f *fiftyFiftyFiftyFeeds) Fetch(ctx context.Context) []*Killmail {
 	return f.fetchKillmailInfo(killmails)
 }
 
-func (f *fiftyFiftyFiftyFeeds) NewCache(newKillmailsChannel chan *Killmail, cacheItemLimit int) fiftyFiftyFiftyFeedsCache {
+func (f *fiftyFiftyFiftyFeeds) NewCache(newKillmailsChannel chan *Killmail, cacheItemLimit int, cacheUpdatedChannel chan KillmailCollection) fiftyFiftyFiftyFeedsCache {
 	return fiftyFiftyFiftyFeedsCache{
 		newKillmailsChannel: newKillmailsChannel,
 		itemLimit:           cacheItemLimit,
 		feeds:               make([]*Killmail, 0, cacheItemLimit),
+		cacheUpdatedChannel: cacheUpdatedChannel,
 	}
 }
 
@@ -157,6 +159,7 @@ func (cache *fiftyFiftyFiftyFeedsCache) addKillmail(killmail *Killmail) {
 	if len(cache.feeds) > cache.itemLimit {
 		cache.feeds = cache.feeds[:cache.itemLimit]
 	}
+	cache.cacheUpdatedChannel <- cache.feeds
 
 	cache.dirty = true
 }
@@ -165,7 +168,7 @@ func (cache *fiftyFiftyFiftyFeedsCache) IsDirty() bool {
 	return cache.dirty
 }
 
-func (cache *fiftyFiftyFiftyFeedsCache) Killmails() []*Killmail {
+func (cache *fiftyFiftyFiftyFeedsCache) Killmails() KillmailCollection {
 	return cache.feeds
 }
 

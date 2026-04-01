@@ -18,6 +18,7 @@ import (
 
 type feedboardWebsocketServer struct {
 	KillmailReceiverChannel chan *zkillboard.Killmail
+	CacheUpdatedChannel     <-chan zkillboard.KillmailCollection
 	subscribers             map[*feedboardSubscriber]struct{}
 	subscribersMutex        sync.Mutex
 	templateBuilderMutex    sync.Mutex
@@ -27,10 +28,11 @@ type feedboardWebsocketServerBuilder struct{}
 
 var FeedboardWebsocketServerBuilder feedboardWebsocketServerBuilder
 
-func (builder *feedboardWebsocketServerBuilder) New(killmailChannel chan *zkillboard.Killmail) feedboardWebsocketServer {
+func (builder *feedboardWebsocketServerBuilder) New(killmailChannel chan *zkillboard.Killmail, cacheUpdatedChannel <-chan zkillboard.KillmailCollection) feedboardWebsocketServer {
 	return feedboardWebsocketServer{
 		KillmailReceiverChannel: killmailChannel,
 		subscribers:             make(map[*feedboardSubscriber]struct{}),
+		CacheUpdatedChannel:     cacheUpdatedChannel,
 	}
 }
 
@@ -74,6 +76,24 @@ func (server *feedboardWebsocketServer) StartKillmailListener() {
 			slog.Debug("Received killmail", "id", killmail.KillmailID)
 			templ := template.Must(template.ParseFS(templates.HTMLTemplates, "feedboard_item.html"))
 			err := templ.Execute(&templateBuffer, &killmail)
+			if err != nil {
+				slog.Error("Failed to parse template", "error", err)
+				continue
+			}
+			server.sendTemplate(templateBuffer.Bytes())
+			templateBuffer.Reset()
+			server.templateBuilderMutex.Unlock()
+		}
+	}()
+
+	go func() {
+		var templateBuffer bytes.Buffer
+		for {
+			killmailsCollection := <-server.CacheUpdatedChannel
+
+			server.templateBuilderMutex.Lock()
+			templ := template.Must(template.ParseFS(templates.HTMLTemplates, "feedboard_isk_total.html"))
+			err := templ.Execute(&templateBuffer, &killmailsCollection)
 			if err != nil {
 				slog.Error("Failed to parse template", "error", err)
 				continue

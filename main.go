@@ -32,7 +32,8 @@ func main() {
 	zkillboardR2Z2.Start()
 
 	feedsCacheChannel := make(chan *zkillboard.Killmail, 10)
-	feedCache := zkillboard.FiftyFiftyFiftyFeeds.NewCache(feedsCacheChannel, eveonline.KILLMAILCOUNT)
+	cacheUpdateChannel := make(chan zkillboard.KillmailCollection, 10)
+	feedCache := zkillboard.FiftyFiftyFiftyFeeds.NewCache(feedsCacheChannel, eveonline.KILLMAILCOUNT, cacheUpdateChannel)
 	feedCache.StartListening()
 
 	websocketListenerChannel := make(chan *zkillboard.Killmail, 10)
@@ -41,7 +42,7 @@ func main() {
 	killmailPropagator.AddListenerChannel(feedsCacheChannel)
 	killmailPropagator.Start()
 
-	websocketServer := feedboard.FeedboardWebsocketServerBuilder.New(websocketListenerChannel)
+	websocketServer := feedboard.FeedboardWebsocketServerBuilder.New(websocketListenerChannel, cacheUpdateChannel)
 	websocketServer.StartKillmailListener()
 
 	serveHandler := NewServeHandler(&feedCache)

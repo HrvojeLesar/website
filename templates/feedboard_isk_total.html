@@ -1,14 +1,16 @@
 {{ $feedboard := . }} {{ $iskValue := $feedboard.TotalIskValue }}
-<p>
-    Destroyed (<span class="feedboard-isk-hint" title="Ships destroyed: {{ $iskValue.Kills }}">{{ $iskValue.Kills }}</span>) value in isk:
-    <span class="feedboard-isk-green-bg">{{ $iskValue.IskWins }}</span>. 
-    Lost (<span class="feedboard-isk-hint" title="Ships lost: {{ $iskValue.LostShips }}">{{ $iskValue.LostShips }}</span>) value in isk:
-    <span class="feedboard-isk-red-bg">{{ $iskValue.IskLosses }}</span>.
-</p>
-<p>
-    {{ if $iskValue.IsIskPositive }} Total destroyed:
-    <i class="feedboard-isk-green-bg">{{ $iskValue.IskTotal }}</i>
-    {{ else }}
-    Total lost: <i class="feedboard-isk-red-bg">{{ $iskValue.IskTotal }}</i>
-    {{ end }}
-</p>
+<div class="feedboard-isk-item">
+    <p>
+        Destroyed (<span class="feedboard-isk-hint" title="Ships destroyed: {{ $iskValue.Kills }}">{{ $iskValue.Kills }}</span>) value in isk:
+        <span class="feedboard-isk-green-bg">{{ $iskValue.IskWins }}</span>. 
+        Lost (<span class="feedboard-isk-hint" title="Ships lost: {{ $iskValue.LostShips }}">{{ $iskValue.LostShips }}</span>) value in isk:
+        <span class="feedboard-isk-red-bg">{{ $iskValue.IskLosses }}</span>.
+    </p>
+    <p>
+        {{ if $iskValue.IsIskPositive }} Total destroyed:
+        <i class="feedboard-isk-green-bg">{{ $iskValue.IskTotal }}</i>
+        {{ else }}
+        Total lost: <i class="feedboard-isk-red-bg">{{ $iskValue.IskTotal }}</i>
+        {{ end }}
+    </p>
+</div>

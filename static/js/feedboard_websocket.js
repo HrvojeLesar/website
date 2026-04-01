@@ -1,5 +1,7 @@
 function startConnection() {
-    const conn = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/feedboard-subscribe`);
+    const conn = new WebSocket(
+        `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/feedboard-subscribe`,
+    );
 
     conn.addEventListener("open", () => {
         console.log("Connected to feedboard websocket");
@@ -19,10 +21,29 @@ function startConnection() {
 }
 
 const parser = new DOMParser();
-const feedboard = document.getElementsByClassName("feedboard-kills-container")[0];
+const feedboard = document.getElementsByClassName(
+    "feedboard-kills-container",
+)[0];
+const iskTotalsContainer = document.getElementsByClassName(
+    "feedboard-isk-total-container",
+)[0];
 
 function switchFeedboard(newFeedboard) {
-    const newFeedboardElement = parser.parseFromString(newFeedboard, "text/html").body.firstChild;
+    const newFeedboardElement = parser.parseFromString(
+        newFeedboard,
+        "text/html",
+    ).body.firstChild;
+
+    const newFeedboardElementClass = newFeedboardElement.className;
+
+    if (newFeedboardElementClass === "feedboard-kills-item") {
+        updateFeedboard(newFeedboardElement);
+    } else if (newFeedboardElementClass === "feedboard-isk-item") {
+        updateFeedboardIskValues(newFeedboardElement);
+    }
+}
+
+function updateFeedboard(newFeedboardElement) {
     const lastChildElement = feedboard.children[feedboard.children.length - 1];
     feedboard.removeChild(lastChildElement);
 
@@ -31,6 +52,19 @@ function switchFeedboard(newFeedboard) {
         feedboard.insertBefore(newFeedboardElement, firstChild);
     } else {
         feedboard.appendChild(newFeedboardElement);
+    }
+}
+
+function updateFeedboardIskValues(newIskElement) {
+    for (child of iskTotalsContainer.children) {
+        iskTotalsContainer.removeChild(child);
+    }
+
+    const firstChild = iskTotalsContainer.firstChild;
+    if (firstChild) {
+        iskTotalsContainer.insertBefore(newIskElement, firstChild);
+    } else {
+        iskTotalsContainer.appendChild(newIskElement);
     }
 }
 

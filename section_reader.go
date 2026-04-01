@@ -69,7 +69,7 @@ func (i *Image) IsRawHTML() bool {
 	return *i.Type == HTML
 }
 
-func newSections(killmails []*zkillboard.Killmail) SectionsWrapper {
+func newSections(killmails zkillboard.KillmailCollection) SectionsWrapper {
 	sections := SectionsWrapper{
 		Killmails: killmails,
 	}
