@@ -2,7 +2,6 @@ function themeSwitch() {
     const buttons = document.getElementsByClassName("theme-switch");
     let isDark = isDarkModeEnabled();
     setDocumentTheme(isDark);
-
     for (const button of buttons) {
         button.addEventListener("click", () => {
             toggleLightMode();
@@ -10,13 +9,18 @@ function themeSwitch() {
             setDocumentTheme(isDark);
         });
     }
+
+    window
+        .matchMedia("(prefers-color-scheme: light)")
+        .addEventListener("change", (e) => {
+            if (localStorage.getItem("light-mode") === null) {
+                setDocumentTheme(!e.matches);
+            }
+        });
 }
 
 function setDocumentTheme(isDark) {
-    document.documentElement.setAttribute(
-        "class",
-        isDark ? "dark" : "light"
-    );
+    document.documentElement.setAttribute("class", isDark ? "dark" : "light");
 }
 
 function isDarkModeEnabled() {
@@ -24,15 +28,16 @@ function isDarkModeEnabled() {
 }
 
 function isLightModeEnabled() {
-    return localStorage.getItem("light-mode") === "true";
+    const stored = localStorage.getItem("light-mode");
+    if (stored !== null) {
+        return stored === "true";
+    }
+
+    return window.matchMedia("(prefers-color-scheme: light)").matches;
 }
 
 function toggleLightMode() {
-    if (isLightModeEnabled()) {
-        localStorage.setItem("light-mode", "false");
-    } else {
-        localStorage.setItem("light-mode", "true");
-    }
+    localStorage.setItem("light-mode", isLightModeEnabled() ? "false" : "true");
 }
 
 themeSwitch();

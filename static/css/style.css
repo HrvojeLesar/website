@@ -29,6 +29,21 @@ html.light {
     color-scheme: light;
 }
 
+@media (prefers-color-scheme: light) {
+    :root:not(.dark):not(.light) {
+        --bg-dark-400: rgb(255 255 255);
+        --bg-dark-500: rgb(231 231 231);
+        --bg-dark-700: rgb(200 200 200);
+        --text-dark-50: rgb(0 0 0);
+        --text-dark-100: rgb(12 12 21);
+        --text-dark-200: rgb(52 52 52);
+        --text-dark-300: rgb(88 88 88);
+        --fill-gray-500: #5b5b5b;
+
+        color-scheme: light;
+    }
+}
+
 html {
     font-family:
         ui-sans-serif,
