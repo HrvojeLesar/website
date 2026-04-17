@@ -13,7 +13,7 @@ import (
 
 const (
 	Capsule    = 670
-	CapsuleIsk = 10001
+	CapsuleIsk = 12000
 )
 
 type Zkb struct {
@@ -138,6 +138,9 @@ func (killmail *Killmail) IsFiftyFiftyFiftyKill() bool {
 }
 
 func (killmail *Killmail) IsWorthlessCapsule() bool {
+	if killmail.Esi.Victim.ShipTypeID == Capsule {
+		slog.Info("Capsule detected", "capsule", killmail)
+	}
 	return killmail.Esi.Victim.ShipTypeID == Capsule && killmail.Zkb.TotalValue <= CapsuleIsk
 }
 

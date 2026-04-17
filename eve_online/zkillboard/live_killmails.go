@@ -27,6 +27,10 @@ func (zkillboard *zkillboard) NewZkillboardR2Z2(filterFunc func(*Killmail) bool)
 }
 
 func (zkillboard *zkillboard) DefaultKillmailFilterFunc(killmail *Killmail) bool {
+	if killmail.IsNpcFeed() || killmail.IsWorthlessCapsule() {
+		return false
+	}
+
 	if killmail.Esi.Victim.CorporationID == FIFTY_FIFTY_FIFTY_CORPORATION_ID {
 		return true
 	}
