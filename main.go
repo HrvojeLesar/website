@@ -23,8 +23,6 @@ func port() string {
 	}
 }
 
-// WARN: looks like getting kills while no websocket is connected does not update list correctly
-
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 

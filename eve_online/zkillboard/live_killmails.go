@@ -12,6 +12,8 @@ type zkillboard struct{}
 
 const FIFTY_FIFTY_FIFTY_CORPORATION_ID = 98684728
 
+const SKIP_AFTER_FETCH_FAIL_COUNT = 10
+
 var Zkillboard zkillboard
 
 type zkillboardR2Z2 struct {
@@ -51,7 +53,7 @@ func (r2z2 *zkillboardR2Z2) Start() {
 		return
 	}
 
-	go r2z2.startFetchingSequences(*sequenceNumber)
+	go r2z2.startLivekillmailFetching(*sequenceNumber)
 }
 
 func (r2z2 *zkillboardR2Z2) getLatestSequence() (*SequenceNumber, error) {
@@ -84,7 +86,9 @@ func (r2z2 *zkillboardR2Z2) getLatestSequence() (*SequenceNumber, error) {
 	}
 }
 
-func (r2z2 *zkillboardR2Z2) startFetchingSequences(sequenceNumber SequenceNumber) {
+func (r2z2 *zkillboardR2Z2) startLivekillmailFetching(sequenceNumber SequenceNumber) {
+	fetchFailCounter := 0
+
 	for {
 		context, cancelContext := context.WithTimeout(context.Background(), 5*time.Second)
 		killmail, err := KillmailFetcherApiEndpoint.Fetch(sequenceNumber, context)
@@ -95,10 +99,17 @@ func (r2z2 *zkillboardR2Z2) startFetchingSequences(sequenceNumber SequenceNumber
 			SequenceFile.Save(sequenceNumber)
 		}
 
+		if fetchFailCounter >= SKIP_AFTER_FETCH_FAIL_COUNT {
+			sequenceNumber.Sequence += 1
+			fetchFailCounter = 0
+		}
+
 		if err != nil {
 			slog.Error(fmt.Sprintf("Failed to fetch killmail on sequence number: %d. Error: %v", sequenceNumber.Sequence, err))
 			slog.Debug("Sleeping for 6 seconds after error")
 			time.Sleep(6 * time.Second)
+
+			fetchFailCounter += 1
 			continue
 		}
 
