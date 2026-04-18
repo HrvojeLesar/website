@@ -4,15 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"net/http"
+
+	httpclient "github.com/HrvojeLesar/website/internal/http_client"
 )
 
-const esiKillmailEndpointFormat = "https://esi.evetech.net/latest/killmails/%d/%s/?datasource=tranquility"
+type esiKillmailEndpoint struct {
+	httpClient httpclient.Client
+}
 
-type esiKillmailEndpoint struct{}
+func NewESIKillmail(client httpclient.Client) *esiKillmailEndpoint {
+	return &esiKillmailEndpoint{httpClient: client}
+}
 
-var EsiKillmail esiKillmailEndpoint
+var EsiKillmail = NewESIKillmail(&http.Client{})
 
 type ESIKillmail struct {
 	KillmailID    int    `json:"killmail_id"`
@@ -39,22 +44,21 @@ type ESIKillmail struct {
 	} `json:"victim"`
 }
 
-func (endpoint *esiKillmailEndpoint) Fetch(killmailid int64, hash string, ctx context.Context) (*ESIKillmail, error) {
-	response, err := http.Get(fmt.Sprintf(esiKillmailEndpointFormat, killmailid, hash))
+func (e *esiKillmailEndpoint) Fetch(killmailID int64, hash string, ctx context.Context) (*ESIKillmail, error) {
+	url := fmt.Sprintf("https://esi.evetech.net/latest/killmails/%d/%s/?datasource=tranquility", killmailID, hash)
+	resp, err := e.httpClient.Get(url)
 	if err != nil {
-		slog.Error("Esikillmail response failed", "error", err)
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer resp.Body.Close()
 
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Unexpected status code: %d", response.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	var killmail ESIKillmail
-	if err := json.NewDecoder(response.Body).Decode(&killmail); err != nil {
-		slog.Error("Failed to parse esi killmail json", "error", err)
-		return nil, err
+	if err := json.NewDecoder(resp.Body).Decode(&killmail); err != nil {
+		return nil, fmt.Errorf("decoding JSON: %w", err)
 	}
 
 	return &killmail, nil

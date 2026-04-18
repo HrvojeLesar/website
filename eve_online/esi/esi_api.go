@@ -8,39 +8,51 @@ import (
 	"time"
 
 	eveonline "github.com/HrvojeLesar/website/eve_online"
+	httpclient "github.com/HrvojeLesar/website/internal/http_client"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 )
 
-type esiEndpoint struct{}
+type esiEndpoint struct {
+	httpClient     httpclient.Client
+	characterCache *expirable.LRU[int, *eveonline.Character]
+}
 
-var EsiEndpoint esiEndpoint
+func NewESIEndpoint(client httpclient.Client) *esiEndpoint {
+	cache := expirable.NewLRU[int, *eveonline.Character](50, nil, time.Hour*24*30)
+	return &esiEndpoint{
+		httpClient:     client,
+		characterCache: cache,
+	}
+}
 
-const esiCharacterEndpointFormat = "https://esi.evetech.net/latest/characters/%d/?datasource=tranquility"
+func GetEsiCharacterUrl(id int) string {
+	return fmt.Sprintf("https://esi.evetech.net/latest/characters/%d/?datasource=tranquility", id)
+}
 
-var characterCache = expirable.NewLRU[int, *eveonline.Character](50, nil, time.Hour*24*30)
+var EsiEndpoint = NewESIEndpoint(&http.Client{})
 
-func (esiEndpoint *esiEndpoint) FetchCharacter(id int, ctx context.Context) (*eveonline.Character, error) {
-	cachedChar, ok := characterCache.Get(id)
-	if ok {
-		return cachedChar, nil
+func (e *esiEndpoint) FetchCharacter(id int, ctx context.Context) (*eveonline.Character, error) {
+	if cached, ok := e.characterCache.Get(id); ok {
+		return cached, nil
 	}
 
-	response, err := http.Get(fmt.Sprintf(esiCharacterEndpointFormat, id))
+	url := GetEsiCharacterUrl(id)
+	resp, err := e.httpClient.Get(url)
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer resp.Body.Close()
 
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Unexpected status code: %d", response.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	character := eveonline.Character{Id: id}
-	if err := json.NewDecoder(response.Body).Decode(&character); err != nil {
-		return nil, fmt.Errorf("Error decoding JSON: %v", err)
+	var character eveonline.Character
+	character.Id = id
+	if err := json.NewDecoder(resp.Body).Decode(&character); err != nil {
+		return nil, fmt.Errorf("decoding JSON: %w", err)
 	}
 
-	characterCache.Add(id, &character)
-
+	e.characterCache.Add(id, &character)
 	return &character, nil
 }

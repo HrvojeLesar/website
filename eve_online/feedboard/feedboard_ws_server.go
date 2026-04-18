@@ -16,12 +16,23 @@ import (
 	"github.com/coder/websocket"
 )
 
+type SubscriberFactory interface {
+	New(closeSlowFunc func()) feedboardSubscriber
+}
+
+type defaultSubscriberFactory struct{}
+
+func (defaultSubscriberFactory) New(closeSlowFunc func()) feedboardSubscriber {
+	return FeedboardSubscriberBuilder.NewSubscriber(closeSlowFunc)
+}
+
 type feedboardWebsocketServer struct {
 	KillmailReceiverChannel chan *zkillboard.Killmail
 	CacheUpdatedChannel     <-chan zkillboard.KillmailCollection
 	subscribers             map[*feedboardSubscriber]struct{}
 	subscribersMutex        sync.Mutex
 	templateBuilderMutex    sync.Mutex
+	subscriberFactory       SubscriberFactory
 }
 
 type feedboardWebsocketServerBuilder struct{}
@@ -33,6 +44,7 @@ func (builder *feedboardWebsocketServerBuilder) New(killmailChannel chan *zkillb
 		KillmailReceiverChannel: killmailChannel,
 		subscribers:             make(map[*feedboardSubscriber]struct{}),
 		CacheUpdatedChannel:     cacheUpdatedChannel,
+		subscriberFactory:       defaultSubscriberFactory{},
 	}
 }
 
@@ -114,7 +126,7 @@ func (server *feedboardWebsocketServer) subscribe(ctx context.Context, writer ht
 	defer acceptedConnection.CloseNow()
 
 	closed := false
-	subscriber := FeedboardSubscriberBuilder.NewSubscriber(func() {
+	subscriber := server.subscriberFactory.New(func() {
 		connectionMutex.Lock()
 		defer connectionMutex.Unlock()
 		closed = true
